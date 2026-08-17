@@ -198,7 +198,7 @@
 
     /* 3D Flippable Polaroid Memory Card */
     .polaroid-card{
-      display:none; margin-top:14px; perspective: 1000px;
+      display:none; margin-top:14px; margin-bottom:24px; perspective: 1000px;
       animation:polaroidPop .35s ease-out both;
     }
     .polaroid-card.show{display:block}
@@ -207,7 +207,7 @@
       100%{transform:scale(1) rotate(-1deg);opacity:1}
     }
     .polaroid-inner{
-      position: relative; width: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative; width: 100%; min-height: 410px; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       transform-style: preserve-3d;
     }
     .polaroid-card.flipped .polaroid-inner{
@@ -217,13 +217,13 @@
       background:#fff; border:4px solid var(--ink); padding:16px 16px 14px;
       box-shadow:6px 6px 0 #0005; border-radius:6px;
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
     }
     .polaroid-front{
-      transform: rotate(-0.5deg);
+      transform: rotate(-0.5deg); min-height: 410px;
     }
     .polaroid-back{
-      transform: rotateY(180deg) rotate(0.5deg); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+      transform: rotateY(180deg) rotate(0.5deg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; min-height: 410px;
     }
     .polaroid-header{
       display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;
@@ -243,10 +243,10 @@
     .polaroid-photo-frame{
       background: #fdfaf4; border: 3px solid var(--ink); padding: 8px 8px 10px;
       box-shadow: inset 0 0 8px rgba(0,0,0,0.06); text-align: center; border-radius: 4px;
-      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      flex: 1; display: flex; flex-direction: column; justify-content: center; margin-bottom: 6px;
     }
     .polaroid-real-img{
-      width: 100%; height: 175px; object-fit: cover; border-radius: 2px;
+      width: 100%; height: 170px; object-fit: cover; border-radius: 2px;
       border: 2px solid #ecdac6; display: block;
     }
     .polaroid-photo-caption{
@@ -256,21 +256,26 @@
     .polaroid-flip-btn{
       width: 100%; background: #fef3c7; border: 2px dashed #f59e0b; border-radius: 8px;
       padding: 7px 10px; font-weight: 900; font-size: 12px; color: #92400e; cursor: pointer;
-      margin: 6px 0 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin: 4px 0 8px; display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: .12s transform, .12s background;
     }
     .polaroid-flip-btn:hover{background: #fde68a}
     .polaroid-flip-btn:active{transform: scale(0.97)}
 
     .finish-panel{
-      display:none;border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:12px;
+      display:none;border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:12px;margin-bottom:20px;
       text-align:center;box-shadow:4px 4px 0 #0004;border-radius:8px;
     }
     .finish-panel.show{display:block}
     .finish-panel .score{font-size:20px;font-weight:900;color:#c47b00;margin-bottom:6px}
     .skip-link{
-      display:block;margin:8px auto 0;border:0;background:transparent;text-decoration:underline;
+      display:block;margin:8px auto 16px;border:0;background:transparent;text-decoration:underline;
       color:var(--ink);font-size:11px;cursor:pointer;opacity:.65;
+    }
+    .screen:has(.polaroid-card.show) .skip-link,
+    .screen:has(.finish-panel.show) .skip-link,
+    .screen:has(.reveal-card.show) .skip-link{
+      display:none !important;
     }
 
     /* Final Reveal & Wedding Features */
@@ -1345,6 +1350,7 @@
     const finishPanel=document.getElementById(code+'-finish'); if(finishPanel) finishPanel.classList.remove('show');
     const memoryCard=document.getElementById(code+'-memory'); if(memoryCard) memoryCard.classList.remove('show');
     const revealCard=document.getElementById(code+'-reveal'); if(revealCard) revealCard.classList.remove('show');
+    const skipBtn=document.querySelector('#'+code+' .skip-link'); if(skipBtn) skipBtn.style.display='';
     const coinCount=document.getElementById(code+'-coin-count'); if(coinCount) coinCount.textContent='0';
     const status=document.getElementById(code+'-status');
     if(status) status.textContent=(code==='final' ? 'Collect love items →' : 'Run & Collect →');
@@ -1832,6 +1838,13 @@
     const g=games[code];
     if(g && g.finished) return;
     if(g){ g.finished=true; if(g.raf) cancelAnimationFrame(g.raf); }
+
+    // Explicitly hide skip-link button upon level completion
+    const screenEl = document.getElementById(code);
+    if(screenEl){
+      const skipBtn = screenEl.querySelector('.skip-link');
+      if(skipBtn) skipBtn.style.display = 'none';
+    }
 
     if(code==='final'){
       isWeddingMusic = true;
