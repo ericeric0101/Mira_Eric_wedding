@@ -8,6 +8,22 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#16213e" />
   <title>Our Story Adventure — Mira & Eric Wedding</title>
+
+  <!-- Instant Preload Key Assets for Zero-Lag Loading -->
+  <link rel="preload" as="image" href="assets/backgrounds/opening.png" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/backgrounds/world-map.png" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/backgrounds/taiwan.png" />
+  <link rel="preload" as="image" href="assets/backgrounds/germany.png" />
+  <link rel="preload" as="image" href="assets/backgrounds/korea.png" />
+  <link rel="preload" as="image" href="assets/backgrounds/final.png" />
+  <link rel="preload" as="image" href="assets/players/player1-idle.png" />
+  <link rel="preload" as="image" href="assets/players/player2.png" />
+  <link rel="preload" as="image" href="assets/players/player1-run1.png" />
+  <link rel="preload" as="image" href="assets/players/player1-run2.png" />
+  <link rel="preload" as="image" href="assets/players/player1-jump.png" />
+  <link rel="preload" as="image" href="assets/ui/flag.png" />
+  <link rel="preload" as="image" href="assets/ui/ring.png" />
+
   <style>
     :root{
       --ink:#18213a; --cream:#fff7e6; --sky:#8fd7ff; --grass:#63b75d;
@@ -298,12 +314,12 @@
       </div>
       <div class="hero-sprites">
         <button type="button" id="choose-p1" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p1')">
-          <img id="hero-player1" alt="Player 1 pixel sprite" />
+          <img id="hero-player1" src="assets/players/player1-idle.png" alt="Player 1 pixel sprite" />
           <span>PLAYER 1</span>
           <small>TAIWAN START</small>
         </button>
         <button type="button" id="choose-p2" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p2')">
-          <img id="hero-player2" alt="Player 2 pixel sprite" />
+          <img id="hero-player2" src="assets/players/player2.png" alt="Player 2 pixel sprite" />
           <span>PLAYER 2</span>
           <small>KOREA START</small>
         </button>
@@ -537,7 +553,7 @@
     <div id="final-reveal" class="reveal-card">
       <div class="mini">ACHIEVEMENT UNLOCKED</div>
       <div class="big" id="final-headline">WE GOT<br/>MARRIED</div>
-      <div class="final-couple"><img id="final-player1" alt="Player 1"/><span class="final-heart">♥</span><img id="final-player2" alt="Player 2"/></div>
+      <div class="final-couple"><img id="final-player1" src="assets/players/player1-idle.png" alt="Player 1"/><span class="final-heart">♥</span><img id="final-player2" src="assets/players/player2.png" alt="Player 2"/></div>
       <p class="line" id="final-announcement">We are not planning a big wedding or a grand ceremony. But you are part of our story, so we still wanted to share this happy little chapter with you.</p>
       
       <div id="final-route-visual" class="final-route-strip"></div>
@@ -718,7 +734,9 @@
     if(target) target.classList.add('active');
     if(id==='map') refreshMap();
     if(id==='guestbook') renderMessages();
-    if(['tw','de','kr','final'].includes(id)) setTimeout(()=>startGame(id), 60);
+    if(['tw','de','kr','final'].includes(id)) {
+      requestAnimationFrame(()=>startGame(id));
+    }
     window.scrollTo(0,0);
   }
   function openLevel(id){ if(isUnlocked(id)) go(id); }
@@ -1010,8 +1028,8 @@
           [1180, 290, 170, 18],
           [1420, 240, 180, 18],
           [1640, 290, 170, 18],
-          [1880, 250, 190, 18],
-          [2100, 300, 260, 18] // Extended finish platform to 2360
+          [1880, 250, 180, 18],
+          [2060, 300, 120, 18] // Shortened final jump platform before ground finish
         ],
         coins: [
           [340, 260],   // 1. Bubble Tea
@@ -1031,8 +1049,8 @@
           [1240, 290, 170, 18],
           [1480, 240, 180, 18],
           [1700, 290, 170, 18],
-          [1940, 250, 190, 18],
-          [2120, 300, 240, 18] // Extended finish platform to 2360
+          [1920, 250, 180, 18],
+          [2080, 300, 120, 18] // Shortened final jump platform before ground finish
         ],
         coins: [
           [360, 260],   // 1. Pretzel
@@ -1052,8 +1070,8 @@
           [1200, 290, 170, 18],
           [1440, 240, 180, 18],
           [1660, 290, 170, 18],
-          [1900, 250, 190, 18],
-          [2120, 300, 240, 18] // Extended finish platform to 2360
+          [1900, 250, 180, 18],
+          [2080, 300, 120, 18] // Shortened final jump platform before ground finish
         ],
         coins: [
           [350, 260],   // 1. Blossom
@@ -1072,7 +1090,7 @@
           [1200, 240, 200, 18],
           [1500, 290, 180, 18],
           [1800, 240, 200, 18],
-          [2080, 290, 280, 18] // Extended finish platform to 2360
+          [2040, 290, 120, 18] // Shortened final jump platform before ground wedding gate
         ],
         coins: [
           [690, 200],   // 1. Heart
@@ -1408,10 +1426,10 @@
       }
     });
 
-    // Render Stage Goal (Flag further right at x = 2340 or Final Wedding Arch)
+    // Render Stage Goal (Flag standing on ground at x = 2320 or Final Wedding Arch)
     if(g.code==='final'){
-      // Grand Wedding Flower Arch / Ring Gate at x = 2270
-      const gx = 2270, gy = 190, gw = 96, gh = 130;
+      // Grand Wedding Flower Arch / Ring Gate on ground at x = 2270
+      const gx = 2270, gy = g.groundY - 128, gw = 96, gh = 130;
       ctx.save();
       ctx.strokeStyle='#9d7b59'; ctx.lineWidth=8;
       ctx.beginPath(); ctx.arc(gx+gw/2, gy+gh/2, gw/2-6, Math.PI*1.03, Math.PI*1.97); ctx.stroke();
@@ -1433,14 +1451,14 @@
       }
       ctx.restore();
     } else {
-      // Goal Flag at x = 2340 (Right on the extended finish platform)
+      // Goal Flag planted on the ground grass at x = 2320
       const flagImg = loadedAssets[ASSET_PATHS.ui.flag];
       if(flagImg){
         const fh=80, fw=fh*(flagImg.width/flagImg.height);
-        ctx.drawImage(flagImg, 2340 - fw/2, 292, fw, fh);
+        ctx.drawImage(flagImg, 2320 - fw/2, g.groundY - fh + 2, fw, fh);
       } else {
-        ctx.fillStyle='#363b4f'; ctx.fillRect(2340, 278, 8, 94);
-        ctx.fillStyle='#e96a7a'; ctx.beginPath(); ctx.moveTo(2348, 282); ctx.lineTo(2376, 292); ctx.lineTo(2348, 304); ctx.closePath(); ctx.fill();
+        ctx.fillStyle='#363b4f'; ctx.fillRect(2320, g.groundY - 84, 8, 84);
+        ctx.fillStyle='#e96a7a'; ctx.beginPath(); ctx.moveTo(2328, g.groundY - 80); ctx.lineTo(2356, g.groundY - 70); ctx.lineTo(2328, g.groundY - 58); ctx.closePath(); ctx.fill();
       }
     }
 
@@ -1531,8 +1549,8 @@
       panel.classList.add('show');
     }
 
-    if(memory) memory.scrollIntoView({behavior:'smooth',block:'center'});
-    else if(panel) panel.scrollIntoView({behavior:'smooth',block:'center'});
+    if(memory && typeof memory.scrollIntoView === 'function') memory.scrollIntoView({behavior:'smooth',block:'center'});
+    else if(panel && typeof panel.scrollIntoView === 'function') panel.scrollIntoView({behavior:'smooth',block:'center'});
   }
 
   // --- Input Handlers (One-touch Jump & Keyboard) ---
