@@ -1313,106 +1313,73 @@
     const ctx=g.ctx, p=g.player, camX=g.cameraX;
     ctx.clearRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
 
-    // ================= LAYER 0: SKY & PARALLAX FAR LAYER (0.15x) =================
-    ctx.save();
-    if(g.code==='final'){
-      const grad = ctx.createLinearGradient(0,0,0,VIEW_HEIGHT);
-      grad.addColorStop(0,'#4a3f7a'); grad.addColorStop(.6,'#1a2444'); grad.addColorStop(1,'#0c1022');
-      ctx.fillStyle=grad; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
-    } else {
-      ctx.fillStyle=g.theme.sky; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
-    }
+    // ================= BACKGROUND IMAGE WITH PARALLAX =================
+    const bgKey = ASSET_PATHS.bg && ASSET_PATHS.bg[g.code];
+    const bg = bgKey ? loadedAssets[bgKey] : null;
 
-    // Clouds / Stars Parallax
-    const farParallax = camX * 0.15;
-    if(g.code==='final'){
-      ctx.fillStyle='rgba(255,255,255,.9)';
-      for(let i=0; i<30; i++){
-        const sx = ((i*97 - farParallax) % 850 + 850) % 850;
-        const sy = (i*37) % 220 + 20;
-        ctx.fillRect(sx, sy, 3, 3);
-      }
-    } else {
-      ctx.fillStyle='rgba(255,255,255,.85)';
-      for(let i=0; i<8; i++){
-        const cx = ((i*260 - farParallax) % 950 + 950) % 950 - 80;
-        const cy = 40 + (i%3)*30;
-        ctx.fillRect(cx, cy, 75, 20);
-        ctx.fillRect(cx+16, cy-14, 42, 16);
-      }
-    }
-    ctx.restore();
+    if(bg){
+      // Parallax scrolling for background artwork across the 2400px stage
+      const bgW = VIEW_WIDTH;
+      const bgH = VIEW_HEIGHT;
+      const bgOffset = (camX * 0.35) % bgW;
 
-    // ================= LAYER 1: MIDGROUND PARALLAX (0.45x) =================
-    const midParallax = camX * 0.45;
-    ctx.save();
-    if(g.code==='tw'){
-      // Mountain Ridges
-      ctx.fillStyle='#6fa26f';
-      ctx.beginPath();
-      for(let x=0; x<=VIEW_WIDTH+100; x+=80){
-        const worldX = x + midParallax;
-        const my = 260 + Math.sin(worldX*0.006)*45;
-        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
+      ctx.save();
+      // Primary tile
+      ctx.drawImage(bg, -bgOffset, 0, bgW, bgH);
+      // Secondary seamless wrap tile
+      if(bgW - bgOffset < VIEW_WIDTH){
+        ctx.drawImage(bg, bgW - bgOffset, 0, bgW, bgH);
       }
-      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
+      ctx.restore();
 
-      // Moving High-Speed Bullet Train
-      g.trainX += 1.6; if(g.trainX > g.worldWidth + 200) g.trainX = -220;
-      const trainScreenX = g.trainX - camX;
-      if(trainScreenX > -250 && trainScreenX < VIEW_WIDTH + 100){
+      // Atmospheric dynamic overlays
+      if(g.code==='tw'){
+        // High Speed Rail Bullet Train animation
+        g.trainX += 1.6; if(g.trainX > g.worldWidth + 200) g.trainX = -220;
+        const trainScreenX = g.trainX - camX;
+        if(trainScreenX > -250 && trainScreenX < VIEW_WIDTH + 100){
+          ctx.save();
+          ctx.fillStyle='#eff7fb'; ctx.fillRect(trainScreenX, 316, 150, 16); ctx.fillRect(trainScreenX+10, 312, 126, 10);
+          ctx.fillStyle='#f38a3f'; ctx.fillRect(trainScreenX+10, 327, 128, 4);
+          ctx.fillStyle='#2b4263'; for(let i=0; i<5; i++) ctx.fillRect(trainScreenX+22+i*22, 318, 14, 6);
+          ctx.beginPath(); ctx.moveTo(trainScreenX+150,316); ctx.lineTo(trainScreenX+172,324); ctx.lineTo(trainScreenX+150,332); ctx.closePath(); ctx.fillStyle='#eff7fb'; ctx.fill();
+          ctx.restore();
+        }
+      } else if(g.code==='kr'){
+        // Cherry Blossom petals floating in breeze
+        const now = performance.now() / 1000;
         ctx.save();
-        ctx.fillStyle='#eff7fb'; ctx.fillRect(trainScreenX, 316, 150, 16); ctx.fillRect(trainScreenX+10, 312, 126, 10);
-        ctx.fillStyle='#f38a3f'; ctx.fillRect(trainScreenX+10, 327, 128, 4);
-        ctx.fillStyle='#2b4263'; for(let i=0; i<5; i++) ctx.fillRect(trainScreenX+22+i*22, 318, 14, 6);
-        ctx.beginPath(); ctx.moveTo(trainScreenX+150,316); ctx.lineTo(trainScreenX+172,324); ctx.lineTo(trainScreenX+150,332); ctx.closePath(); ctx.fillStyle='#eff7fb'; ctx.fill();
+        ctx.fillStyle='rgba(255,188,211,.88)';
+        for(let i=0; i<14; i++){
+          const px = ((i*85 + now*24 - camX*0.35) % (VIEW_WIDTH+60) + (VIEW_WIDTH+60)) % (VIEW_WIDTH+60) - 30;
+          const py = 70 + ((i*43 + now*16) % 260);
+          ctx.fillRect(px, py, 5, 4);
+        }
+        ctx.restore();
+      } else if(g.code==='final'){
+        // Twinkling stars overlay
+        const now = performance.now() / 1000;
+        ctx.save();
+        ctx.fillStyle='rgba(255,225,140,.92)';
+        for(let i=0; i<12; i++){
+          const sx = ((i*80 - camX*0.35) % VIEW_WIDTH + VIEW_WIDTH) % VIEW_WIDTH;
+          const sy = 60 + Math.sin(now*2+i)*18 + (i%3)*40;
+          ctx.fillRect(sx, sy, 4, 4);
+        }
         ctx.restore();
       }
-    } else if(g.code==='de'){
-      // Rhine River & European House Silhouettes
-      ctx.fillStyle='#7e9db8';
-      ctx.beginPath();
-      for(let x=0; x<=VIEW_WIDTH+100; x+=90){
-        const worldX = x + midParallax;
-        const my = 270 + Math.sin(worldX*0.007)*35;
-        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
+    } else {
+      // Procedural fallback while loading
+      ctx.save();
+      if(g.code==='final'){
+        const grad = ctx.createLinearGradient(0,0,0,VIEW_HEIGHT);
+        grad.addColorStop(0,'#4a3f7a'); grad.addColorStop(.6,'#1a2444'); grad.addColorStop(1,'#0c1022');
+        ctx.fillStyle=grad; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
+      } else {
+        ctx.fillStyle=g.theme.sky; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
       }
-      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
-      // Timber Houses
-      for(let i=0; i<12; i++){
-        const hx = ((i*240 - midParallax) % 1000 + 1000) % 1000 - 60;
-        ctx.fillStyle='#c9936b'; ctx.fillRect(hx, 275, 55, 45);
-        ctx.fillStyle='#7a3d32'; ctx.beginPath(); ctx.moveTo(hx-4, 275); ctx.lineTo(hx+27, 245); ctx.lineTo(hx+59, 275); ctx.closePath(); ctx.fill();
-      }
-    } else if(g.code==='kr'){
-      // Seoul Mountain Skyline & Hanok Silhouettes
-      ctx.fillStyle='#8ca885';
-      ctx.beginPath();
-      for(let x=0; x<=VIEW_WIDTH+100; x+=80){
-        const worldX = x + midParallax;
-        const my = 270 + Math.sin(worldX*0.006)*40;
-        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
-      }
-      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
-      // Floating Cherry Blossom Petals
-      const now = performance.now() / 1000;
-      ctx.fillStyle='rgba(255,188,211,.88)';
-      for(let i=0; i<14; i++){
-        const px = ((i*85 + now*24 - midParallax*0.5) % (VIEW_WIDTH+60) + (VIEW_WIDTH+60)) % (VIEW_WIDTH+60) - 30;
-        const py = 70 + ((i*43 + now*16) % 260);
-        ctx.fillRect(px, py, 5, 4);
-      }
-    } else if(g.code==='final'){
-      // Romantic Star Galaxy Particles
-      const now = performance.now() / 1000;
-      ctx.fillStyle='rgba(255,225,140,.92)';
-      for(let i=0; i<12; i++){
-        const sx = ((i*80 - midParallax*0.6) % VIEW_WIDTH + VIEW_WIDTH) % VIEW_WIDTH;
-        const sy = 60 + Math.sin(now*2+i)*18 + (i%3)*40;
-        ctx.fillRect(sx, sy, 4, 4);
-      }
+      ctx.restore();
     }
-    ctx.restore();
 
     // ================= LAYER 2: WORLD SPACE (1.0x - Camera Translated) =================
     ctx.save();
