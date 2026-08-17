@@ -196,16 +196,34 @@
     .storybox{border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:10px;line-height:1.5;box-shadow:4px 4px 0 #0004;border-radius:8px}
     .storybox strong{display:block;margin-bottom:5px}
 
-    /* Polaroid Style Memory Card */
+    /* 3D Flippable Polaroid Memory Card */
     .polaroid-card{
-      display:none; margin-top:14px; background:#fff; border:4px solid var(--ink);
-      padding:16px 16px 14px; box-shadow:6px 6px 0 #0005; border-radius:4px;
-      transform:rotate(-1deg); animation:polaroidPop .35s ease-out both;
+      display:none; margin-top:14px; perspective: 1000px;
+      animation:polaroidPop .35s ease-out both;
     }
     .polaroid-card.show{display:block}
     @keyframes polaroidPop{
       0%{transform:scale(.92) rotate(-3deg);opacity:0}
       100%{transform:scale(1) rotate(-1deg);opacity:1}
+    }
+    .polaroid-inner{
+      position: relative; width: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .polaroid-card.flipped .polaroid-inner{
+      transform: rotateY(180deg);
+    }
+    .polaroid-front, .polaroid-back{
+      background:#fff; border:4px solid var(--ink); padding:16px 16px 14px;
+      box-shadow:6px 6px 0 #0005; border-radius:6px;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    }
+    .polaroid-front{
+      transform: rotate(-0.5deg);
+    }
+    .polaroid-back{
+      transform: rotateY(180deg) rotate(0.5deg); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
     }
     .polaroid-header{
       display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;
@@ -217,9 +235,32 @@
       font-size:22px; filter:drop-shadow(2px 2px 0 #0002);
     }
     .polaroid-body{
-      background:#fffaf0; border:2px dashed #cca; padding:12px; font-size:13px; line-height:1.6; margin-bottom:12px; border-radius:4px;
+      background:#fffaf0; border:2px dashed #cca; padding:12px; font-size:13px; line-height:1.6; margin-bottom:8px; border-radius:4px;
     }
     .polaroid-body h3{margin:0 0 6px; font-size:16px; color:var(--ink)}
+
+    /* Real Photo Frame on Back */
+    .polaroid-photo-frame{
+      background: #fdfaf4; border: 3px solid var(--ink); padding: 8px 8px 10px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.06); text-align: center; border-radius: 4px;
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+    }
+    .polaroid-real-img{
+      width: 100%; height: 175px; object-fit: cover; border-radius: 2px;
+      border: 2px solid #ecdac6; display: block;
+    }
+    .polaroid-photo-caption{
+      margin-top: 8px; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-weight: 800; font-size: 13px; color: #4a3828; letter-spacing: 0.5px;
+    }
+    .polaroid-flip-btn{
+      width: 100%; background: #fef3c7; border: 2px dashed #f59e0b; border-radius: 8px;
+      padding: 7px 10px; font-weight: 900; font-size: 12px; color: #92400e; cursor: pointer;
+      margin: 6px 0 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: .12s transform, .12s background;
+    }
+    .polaroid-flip-btn:hover{background: #fde68a}
+    .polaroid-flip-btn:active{transform: scale(0.97)}
 
     .finish-panel{
       display:none;border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:12px;
@@ -242,6 +283,20 @@
     .reveal-card .mini{font-size:12px;letter-spacing:1px;font-weight:900;color:#ffd166}
     .reveal-card .big{font-size:36px;line-height:1.05;margin:8px 0 10px;color:#ffd166;text-shadow:3px 3px 0 #000}
     .reveal-card .line{max-width:360px;margin:0 auto 12px;line-height:1.6;font-size:14px}
+    
+    /* Real Wedding Photo Frame in Final Reveal */
+    .final-photo-card{
+      background:#fff; border:3px solid #ffd166; padding:8px 8px 10px;
+      border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.4); margin:12px auto 14px;
+      max-width:340px; text-align:center; transform:rotate(-1deg);
+    }
+    .final-wedding-img{
+      width:100%; height:195px; object-fit:cover; border-radius:3px; display:block;
+    }
+    .final-photo-caption{
+      color:var(--ink); font-weight:800; font-size:13px; margin-top:6px; font-family:"PingFang TC","Microsoft JhengHei",sans-serif;
+    }
+
     .final-couple{display:flex;align-items:end;justify-content:center;gap:12px;margin:12px 0}
     .final-couple img{height:68px;width:auto;image-rendering:pixelated;filter:drop-shadow(3px 3px 0 #0005)}
     .final-heart{font-size:28px;color:#ff7f9f;margin-bottom:12px;animation:heartBeat 1.2s infinite}
@@ -386,15 +441,32 @@
     </div>
 
     <div id="tw-memory" class="polaroid-card">
-      <div class="polaroid-header">
-        <span class="polaroid-badge">🇹🇼 CHAPTER 01 CLEAR</span>
-        <span class="polaroid-stamp">🧋 🚄</span>
+      <div class="polaroid-inner">
+        <div class="polaroid-front">
+          <div class="polaroid-header">
+            <span class="polaroid-badge">🇹🇼 CHAPTER 01 CLEAR</span>
+            <span class="polaroid-stamp">🧋 🚄</span>
+          </div>
+          <div class="polaroid-body">
+            <h3>MEMORY UNLOCKED: HOME BASE</h3>
+            <p id="tw-memory-copy">A short first chapter about where part of the story began — familiar places, everyday details, and the first step toward a much bigger journey.</p>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('tw')">
+            <span>📷 點擊翻轉看真實照片 ↺</span>
+          </button>
+          <button class="btn gold" onclick="complete('tw')">Back to World Map →</button>
+        </div>
+        <div class="polaroid-back">
+          <div class="polaroid-photo-frame">
+            <img id="tw-photo-img" class="polaroid-real-img" src="assets/photos/taiwan.jpg" alt="Taiwan memory photo" />
+            <div id="tw-photo-caption" class="polaroid-photo-caption">九份老街的珍珠奶茶回憶 🧋✨</div>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('tw')">
+            <span>↺ 翻回故事卡片</span>
+          </button>
+          <button class="btn gold" onclick="complete('tw')">Back to World Map →</button>
+        </div>
       </div>
-      <div class="polaroid-body">
-        <h3>MEMORY UNLOCKED: HOME BASE</h3>
-        <p id="tw-memory-copy">A short first chapter about where part of the story began — familiar places, everyday details, and the first step toward a much bigger journey.</p>
-      </div>
-      <button class="btn gold" onclick="complete('tw')">Back to World Map →</button>
     </div>
 
     <div id="tw-finish" class="finish-panel">
@@ -441,15 +513,32 @@
     </div>
 
     <div id="de-memory" class="polaroid-card">
-      <div class="polaroid-header">
-        <span class="polaroid-badge">🇩🇪 CHAPTER 02 CLEAR</span>
-        <span class="polaroid-stamp">🥨 ☕ ♥</span>
+      <div class="polaroid-inner">
+        <div class="polaroid-front">
+          <div class="polaroid-header">
+            <span class="polaroid-badge">🇩🇪 CHAPTER 02 CLEAR</span>
+            <span class="polaroid-stamp">🥨 ☕ ♥</span>
+          </div>
+          <div class="polaroid-body">
+            <h3>MEMORY UNLOCKED: PATHS CROSSED</h3>
+            <p id="de-memory-copy">A new country became more than a new address. Somewhere in the middle of ordinary life, solo mode quietly became co-op.</p>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('de')">
+            <span>📷 點擊翻轉看真實照片 ↺</span>
+          </button>
+          <button class="btn gold" onclick="complete('de')">Back to World Map →</button>
+        </div>
+        <div class="polaroid-back">
+          <div class="polaroid-photo-frame">
+            <img id="de-photo-img" class="polaroid-real-img" src="assets/photos/germany.jpg" alt="Germany memory photo" />
+            <div id="de-photo-caption" class="polaroid-photo-caption">科隆大教堂前的命運相遇 ⛪♥</div>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('de')">
+            <span>↺ 翻回故事卡片</span>
+          </button>
+          <button class="btn gold" onclick="complete('de')">Back to World Map →</button>
+        </div>
       </div>
-      <div class="polaroid-body">
-        <h3>MEMORY UNLOCKED: PATHS CROSSED</h3>
-        <p id="de-memory-copy">A new country became more than a new address. Somewhere in the middle of ordinary life, solo mode quietly became co-op.</p>
-      </div>
-      <button class="btn gold" onclick="complete('de')">Back to World Map →</button>
     </div>
 
     <div id="de-finish" class="finish-panel">
@@ -496,15 +585,32 @@
     </div>
 
     <div id="kr-memory" class="polaroid-card">
-      <div class="polaroid-header">
-        <span class="polaroid-badge">🇰🇷 CHAPTER 03 CLEAR</span>
-        <span class="polaroid-stamp">🌸 ✈️ 🍚</span>
+      <div class="polaroid-inner">
+        <div class="polaroid-front">
+          <div class="polaroid-header">
+            <span class="polaroid-badge">🇰🇷 CHAPTER 03 CLEAR</span>
+            <span class="polaroid-stamp">🌸 ✈️ 🍚</span>
+          </div>
+          <div class="polaroid-body">
+            <h3>MEMORY UNLOCKED: OUR WORLD GREW</h3>
+            <p id="kr-memory-copy">Family, food, flights and new memories. By this point, the map no longer felt like separate countries — it started to feel like one shared world.</p>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('kr')">
+            <span>📷 點擊翻轉看真實照片 ↺</span>
+          </button>
+          <button class="btn gold" onclick="complete('kr')">Unlock Final Chapter →</button>
+        </div>
+        <div class="polaroid-back">
+          <div class="polaroid-photo-frame">
+            <img id="kr-photo-img" class="polaroid-real-img" src="assets/photos/korea.jpg" alt="Korea memory photo" />
+            <div id="kr-photo-caption" class="polaroid-photo-caption">北村韓屋村的櫻花約會 🌸</div>
+          </div>
+          <button type="button" class="polaroid-flip-btn" onclick="togglePolaroidFlip('kr')">
+            <span>↺ 翻回故事卡片</span>
+          </button>
+          <button class="btn gold" onclick="complete('kr')">Unlock Final Chapter →</button>
+        </div>
       </div>
-      <div class="polaroid-body">
-        <h3>MEMORY UNLOCKED: OUR WORLD GREW</h3>
-        <p id="kr-memory-copy">Family, food, flights and new memories. By this point, the map no longer felt like separate countries — it started to feel like one shared world.</p>
-      </div>
-      <button class="btn gold" onclick="complete('kr')">Unlock Final Chapter →</button>
     </div>
 
     <div id="kr-finish" class="finish-panel">
@@ -553,6 +659,13 @@
     <div id="final-reveal" class="reveal-card">
       <div class="mini">ACHIEVEMENT UNLOCKED</div>
       <div class="big" id="final-headline">WE GOT<br/>MARRIED</div>
+      
+      <!-- Real Wedding Photo in Polaroid Frame -->
+      <div class="final-photo-card">
+        <img id="final-photo-img" src="assets/photos/wedding.jpg" alt="Real Wedding Photo" class="final-wedding-img" />
+        <div id="final-photo-caption" class="final-photo-caption">從兩個人到一個家，我們結婚了 💍</div>
+      </div>
+
       <div class="final-couple"><img id="final-player1" src="assets/players/player1-idle.png" alt="Player 1"/><span class="final-heart">♥</span><img id="final-player2" src="assets/players/player2.png" alt="Player 2"/></div>
       <p class="line" id="final-announcement">We are not planning a big wedding or a grand ceremony. But you are part of our story, so we still wanted to share this happy little chapter with you.</p>
       
@@ -650,6 +763,20 @@
       thanks: 'Thanks for playing through a small piece of our story. ♥'
     },
 
+    // 📷 Real Couple Photos revealed on Polaroid card back
+    photos: {
+      tw: 'assets/photos/taiwan.jpg',
+      de: 'assets/photos/germany.jpg',
+      kr: 'assets/photos/korea.jpg',
+      final: 'assets/photos/wedding.jpg'
+    },
+    photoCaptions: {
+      tw: '九份老街的珍珠奶茶回憶 🧋✨',
+      de: '科隆大教堂前的命運相遇 ⛪♥',
+      kr: '北村韓屋村的櫻花約會 🌸',
+      final: '從兩個人到一個家，我們結婚了 💍'
+    },
+
     audio: {
       src: null,
       volume: 0.16,
@@ -732,6 +859,7 @@
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     const target=document.getElementById(id);
     if(target) target.classList.add('active');
+    if(id!=='final') isWeddingMusic = false;
     if(id==='map') refreshMap();
     if(id==='guestbook') renderMessages();
     if(['tw','de','kr','final'].includes(id)) {
@@ -848,6 +976,26 @@
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now+i*0.1); osc.stop(now+i*0.1+0.36);
         });
+      } else if(type==='spring'){
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.type='sine';
+        osc.frequency.setValueAtTime(320,now);
+        osc.frequency.exponentialRampToValueAtTime(880,now+0.18);
+        gain.gain.setValueAtTime(0.24,now);
+        gain.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now+0.24);
+      } else if(type==='flip'){
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.type='triangle';
+        osc.frequency.setValueAtTime(440,now);
+        osc.frequency.exponentialRampToValueAtTime(680,now+0.08);
+        gain.gain.setValueAtTime(0.14,now);
+        gain.gain.exponentialRampToValueAtTime(0.001,now+0.10);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now+0.11);
       }
     }catch(e){}
   }
@@ -880,6 +1028,15 @@
   const musicNotes=[72,76,79,76,69,72,76,72,65,69,72,69,67,71,74,71];
   const bassNotes=[48,45,41,43];
 
+  // 8-Bit Chiptune Wedding March Melodies (Mendelssohn & Wagner celebratory themes)
+  const weddingMarchNotes = [
+    65, 65, 65, 65,  69, 67, 65, 64,  65, 69, 72, 77,  76, 72, 74, 76,
+    65, 65, 65, 65,  69, 67, 65, 64,  65, 69, 72, 77,  76, 74, 76, 77,
+    77, 76, 74, 72,  74, 72, 69, 67,  69, 72, 76, 77,  72, 69, 67, 65
+  ];
+  const weddingMarchBass = [41, 41, 48, 48, 45, 45, 53, 53, 41, 41, 48, 48, 45, 45, 53, 53];
+  let isWeddingMusic = false;
+
   function scheduleProceduralStep(){
     if(musicMuted || !musicCtx) return;
     const now=musicCtx.currentTime;
@@ -887,20 +1044,30 @@
     master.gain.setValueAtTime(Math.max(0,Math.min(0.35,Number(CUSTOMIZE_HERE.audio?.volume ?? 0.16))),now);
     master.connect(musicCtx.destination);
 
-    const note=musicNotes[musicStep%musicNotes.length];
+    const activeNotes = isWeddingMusic ? weddingMarchNotes : musicNotes;
+    const activeBass = isWeddingMusic ? weddingMarchBass : bassNotes;
+
+    const note=activeNotes[musicStep%activeNotes.length];
     const osc=musicCtx.createOscillator();
     const gain=musicCtx.createGain();
-    osc.type='square';osc.frequency.setValueAtTime(midiFreq(note),now);
+    osc.type='square';
+    osc.frequency.setValueAtTime(midiFreq(note),now);
     gain.gain.setValueAtTime(0.0001,now);
-    gain.gain.exponentialRampToValueAtTime(0.10,now+0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001,now+0.22);
-    osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+0.24);
+    gain.gain.exponentialRampToValueAtTime(isWeddingMusic ? 0.14 : 0.10, now+0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (isWeddingMusic ? 0.26 : 0.22));
+    osc.connect(gain); gain.connect(master);
+    osc.start(now); osc.stop(now + (isWeddingMusic ? 0.28 : 0.24));
 
     if(musicStep%2===0){
-      const bo=musicCtx.createOscillator();const bg=musicCtx.createGain();
-      bo.type='triangle';bo.frequency.setValueAtTime(midiFreq(bassNotes[Math.floor(musicStep/8)%4]),now);
-      bg.gain.setValueAtTime(0.0001,now);bg.gain.exponentialRampToValueAtTime(0.08,now+0.01);bg.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
-      bo.connect(bg);bg.connect(master);bo.start(now);bo.stop(now+0.36);
+      const bo=musicCtx.createOscillator();
+      const bg=musicCtx.createGain();
+      bo.type='triangle';
+      bo.frequency.setValueAtTime(midiFreq(activeBass[Math.floor(musicStep/(isWeddingMusic?4:8))%activeBass.length]),now);
+      bg.gain.setValueAtTime(0.0001,now);
+      bg.gain.exponentialRampToValueAtTime(0.09,now+0.01);
+      bg.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
+      bo.connect(bg); bg.connect(master);
+      bo.start(now); bo.stop(now+0.36);
     }
     musicStep++;
   }
@@ -954,6 +1121,12 @@
       jump: EMBEDDED_ASSETS.player_jump,
       player2: EMBEDDED_ASSETS.player2_idle
     },
+    photos: {
+      tw: CUSTOMIZE_HERE.photos?.tw || 'assets/photos/taiwan.jpg',
+      de: CUSTOMIZE_HERE.photos?.de || 'assets/photos/germany.jpg',
+      kr: CUSTOMIZE_HERE.photos?.kr || 'assets/photos/korea.jpg',
+      final: CUSTOMIZE_HERE.photos?.final || 'assets/photos/wedding.jpg'
+    },
     tw: [EMBEDDED_ASSETS.tw_bubble_tea, EMBEDDED_ASSETS.tw_train, EMBEDDED_ASSETS.tw_pineapple_cake, EMBEDDED_ASSETS.tw_dumpling, EMBEDDED_ASSETS.tw_flask_green],
     de: [EMBEDDED_ASSETS.de_pretzel, EMBEDDED_ASSETS.de_coffee, EMBEDDED_ASSETS.de_train, EMBEDDED_ASSETS.de_flask_blue, EMBEDDED_ASSETS.de_heart],
     kr: [EMBEDDED_ASSETS.kr_blossom, EMBEDDED_ASSETS.kr_food, EMBEDDED_ASSETS.kr_airplane, EMBEDDED_ASSETS.kr_hanok, EMBEDDED_ASSETS.kr_family],
@@ -966,6 +1139,7 @@
   function preloadAssets(){
     const flat = [
       ...Object.values(ASSET_PATHS.player),
+      ...Object.values(ASSET_PATHS.photos),
       ...ASSET_PATHS.tw, ...ASSET_PATHS.de, ...ASSET_PATHS.kr,
       ...Object.values(ASSET_PATHS.ui),
       ...Object.values(ASSET_PATHS.bg)
@@ -984,8 +1158,26 @@
     if(p2) p2.src=ASSET_PATHS.player.player2;
     if(fp1) fp1.src=ASSET_PATHS.player.idle;
     if(fp2) fp2.src=ASSET_PATHS.player.player2;
+    
+    // Set photos and captions from configuration
+    ['tw','de','kr','final'].forEach(code=>{
+      const imgEl = document.getElementById(code+'-photo-img');
+      const capEl = document.getElementById(code+'-photo-caption');
+      if(imgEl && CUSTOMIZE_HERE.photos && CUSTOMIZE_HERE.photos[code]) imgEl.src = CUSTOMIZE_HERE.photos[code];
+      if(capEl && CUSTOMIZE_HERE.photoCaptions && CUSTOMIZE_HERE.photoCaptions[code]) capEl.textContent = CUSTOMIZE_HERE.photoCaptions[code];
+    });
+
     renderPlayerChoice();
   });
+
+  // Flip Polaroid Card Handler
+  function togglePolaroidFlip(code){
+    const card = document.getElementById(code+'-memory');
+    if(card){
+      card.classList.toggle('flipped');
+      playSFX('flip');
+    }
+  }
 
   // ================================================================
   // 🎮 2D AUTO-RUNNER & CAMERA SCROLLING ENGINE
@@ -1037,6 +1229,9 @@
           [1260, 240],  // 3. Pineapple Cake
           [1720, 240],  // 4. Dumpling
           [2180, 250]   // 5. Science Lab Flask
+        ],
+        springs: [
+          { x: 1300, y: 352, w: 46, h: 20, type: 'steamer', label: '🥟' }
         ]
       },
       de: {
@@ -1058,6 +1253,9 @@
           [1110, 310],  // 3. Train (Encounter Zone)
           [1560, 190],  // 4. Blue Flask
           [2020, 200]   // 5. Heart
+        ],
+        springs: [
+          { x: 1340, y: 352, w: 48, h: 20, type: 'train', label: '🚄' }
         ]
       },
       kr: {
@@ -1079,6 +1277,9 @@
           [1250, 240],  // 3. Airplane
           [1710, 240],  // 4. Hanok
           [2170, 250]   // 5. Family
+        ],
+        springs: [
+          { x: 1300, y: 352, w: 46, h: 20, type: 'blossom', label: '🌸' }
         ]
       },
       final: {
@@ -1096,6 +1297,9 @@
           [690, 200],   // 1. Heart
           [1300, 190],  // 2. Love Letter
           [1890, 190]   // 3. Marriage Ring
+        ],
+        springs: [
+          { x: 1340, y: 352, w: 46, h: 20, type: 'heart', label: '💖' }
         ]
       }
     };
@@ -1103,9 +1307,10 @@
     const L=layouts[code];
     const platforms=L.platforms.map(v=>({x:v[0],y:v[1],w:v[2],h:v[3]}));
     const coins=L.coins.map((v,i)=>({x:v[0],y:v[1],r:18,taken:false,label:theme.collectibles[i],asset:itemPaths[i]}));
+    const springs=(L.springs||[]).map(s=>({...s}));
 
     return {
-      code, canvas, ctx, theme, platforms, coins, groundY,
+      code, canvas, ctx, theme, platforms, coins, springs, groundY,
       worldWidth: WORLD_WIDTH,
       cameraX: 0,
       player: {
@@ -1224,6 +1429,33 @@
         p.y = pl.y - p.h;
         p.vy = 0;
         p.onGround = true;
+      }
+    }
+
+    // Specialty Springboards Collision & High Boost Launch
+    if(g.springs){
+      for(const sp of g.springs){
+        const wasAbove = oldY + p.h <= sp.y + 10;
+        const nowCross = p.y + p.h >= sp.y && p.y + p.h <= sp.y + 32;
+        const overlapX = p.x + p.w > sp.x && p.x < sp.x + sp.w;
+        if(p.vy >= 0 && wasAbove && nowCross && overlapX){
+          p.y = sp.y - p.h;
+          p.vy = -14.4;
+          p.onGround = false;
+          p.coyote = 0;
+          p.canDoubleJump = true;
+          playSFX('spring');
+          if(sp.type==='steamer'){
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'🥟 💨'});
+          } else if(sp.type==='train'){
+            p.vx = 4.6;
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'⚡ 🚄'});
+          } else if(sp.type==='blossom'){
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'🌸 ✨'});
+          } else {
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'💖 💍'});
+          }
+        }
       }
     }
 
@@ -1408,6 +1640,41 @@
       drawPixelPlatform(ctx, pl, g.code, isGround);
     });
 
+    // Render Specialty Springboards
+    if(g.springs){
+      g.springs.forEach(sp => {
+        ctx.save();
+        ctx.fillStyle = '#2b221b';
+        ctx.fillRect(sp.x, sp.y + 14, sp.w, 6);
+        ctx.fillStyle = '#ffd166';
+        ctx.fillRect(sp.x + 8, sp.y + 8, sp.w - 16, 6);
+        if(sp.type === 'steamer'){
+          ctx.fillStyle = '#c7975b';
+          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
+          ctx.fillStyle = '#ebd1aa';
+          ctx.fillRect(sp.x + 6, sp.y - 2, sp.w - 12, 4);
+          ctx.font = '16px serif';
+          ctx.fillText('🥟', sp.x + 13, sp.y - 5);
+        } else if(sp.type === 'train'){
+          ctx.fillStyle = '#e85d04';
+          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
+          ctx.font = '16px serif';
+          ctx.fillText('🚄', sp.x + 13, sp.y - 5);
+        } else if(sp.type === 'blossom'){
+          ctx.fillStyle = '#ff8fab';
+          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
+          ctx.font = '16px serif';
+          ctx.fillText('🌸', sp.x + 13, sp.y - 5);
+        } else {
+          ctx.fillStyle = '#f72585';
+          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
+          ctx.font = '16px serif';
+          ctx.fillText('💖', sp.x + 13, sp.y - 5);
+        }
+        ctx.restore();
+      });
+    }
+
     // Render Collectible Items
     g.coins.forEach(c=>{
       if(!c.taken){
@@ -1529,6 +1796,11 @@
     const g=games[code];
     if(g && g.finished) return;
     if(g){ g.finished=true; if(g.raf) cancelAnimationFrame(g.raf); }
+
+    if(code==='final'){
+      isWeddingMusic = true;
+      musicStep = 0;
+    }
 
     const memory=document.getElementById(code+'-memory');
     if(memory) memory.classList.add('show');
