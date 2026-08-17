@@ -1119,7 +1119,10 @@
       run1: EMBEDDED_ASSETS.player_run1,
       run2: EMBEDDED_ASSETS.player_run2,
       jump: EMBEDDED_ASSETS.player_jump,
-      player2: EMBEDDED_ASSETS.player2_idle
+      player2: 'assets/players/player2.png',
+      player2_run1: 'assets/players/player2-run1.png',
+      player2_run2: 'assets/players/player2-run2.png',
+      player2_jump: 'assets/players/player2-jump.png'
     },
     photos: {
       tw: CUSTOMIZE_HERE.photos?.tw || 'assets/photos/taiwan.jpg',
@@ -1217,21 +1220,21 @@
           [480, 260, 170, 18],
           [720, 300, 160, 18],
           [960, 250, 180, 18],
-          [1180, 290, 170, 18],
-          [1420, 240, 180, 18],
-          [1640, 290, 170, 18],
-          [1880, 250, 180, 18],
-          [2060, 300, 120, 18] // Shortened final jump platform before ground finish
+          [1180, 280, 140, 18], // Drop-off towards spring
+          [1480, 250, 170, 18], // Landing platform after spring boost
+          [1700, 290, 170, 18],
+          [1920, 250, 180, 18],
+          [2100, 300, 120, 18]  // Shortened final jump platform before ground finish
         ],
         coins: [
           [340, 260],   // 1. Bubble Tea
           [780, 250],   // 2. High Speed Rail
-          [1260, 240],  // 3. Pineapple Cake
-          [1720, 240],  // 4. Dumpling
+          [1390, 150],  // 3. Pineapple Cake (High air launch target!)
+          [1760, 240],  // 4. Dumpling
           [2180, 250]   // 5. Science Lab Flask
         ],
         springs: [
-          { x: 1300, y: 352, w: 46, h: 20, type: 'steamer', label: '🥟' }
+          { x: 1360, y: 348, w: 60, h: 24, type: 'steamer', label: '🥟' }
         ]
       },
       de: {
@@ -1241,21 +1244,21 @@
           [520, 260, 170, 18],
           [760, 290, 160, 18],
           [1020, 250, 180, 18],
-          [1240, 290, 170, 18],
-          [1480, 240, 180, 18],
-          [1700, 290, 170, 18],
-          [1920, 250, 180, 18],
-          [2080, 300, 120, 18] // Shortened final jump platform before ground finish
+          [1200, 280, 140, 18], // Drop-off towards spring
+          [1500, 250, 170, 18], // Landing platform after sprint boost
+          [1720, 290, 170, 18],
+          [1940, 250, 180, 18],
+          [2120, 300, 120, 18]  // Shortened final jump platform before ground finish
         ],
         coins: [
           [360, 260],   // 1. Pretzel
           [820, 240],   // 2. Coffee
           [1110, 310],  // 3. Train (Encounter Zone)
-          [1560, 190],  // 4. Blue Flask
-          [2020, 200]   // 5. Heart
+          [1420, 150],  // 4. Blue Flask (High air launch target!)
+          [2040, 200]   // 5. Heart
         ],
         springs: [
-          { x: 1340, y: 352, w: 48, h: 20, type: 'train', label: '🚄' }
+          { x: 1380, y: 348, w: 60, h: 24, type: 'train', label: '🚄' }
         ]
       },
       kr: {
@@ -1265,21 +1268,21 @@
           [500, 260, 170, 18],
           [740, 300, 160, 18],
           [980, 250, 180, 18],
-          [1200, 290, 170, 18],
-          [1440, 240, 180, 18],
-          [1660, 290, 170, 18],
-          [1900, 250, 180, 18],
-          [2080, 300, 120, 18] // Shortened final jump platform before ground finish
+          [1190, 280, 140, 18], // Drop-off towards spring
+          [1490, 250, 170, 18], // Landing platform after blossom boost
+          [1710, 290, 170, 18],
+          [1930, 250, 180, 18],
+          [2110, 300, 120, 18]  // Shortened final jump platform before ground finish
         ],
         coins: [
           [350, 260],   // 1. Blossom
           [790, 250],   // 2. Korean Food
-          [1250, 240],  // 3. Airplane
-          [1710, 240],  // 4. Hanok
+          [1410, 150],  // 3. Airplane (High air launch target!)
+          [1760, 240],  // 4. Hanok
           [2170, 250]   // 5. Family
         ],
         springs: [
-          { x: 1300, y: 352, w: 46, h: 20, type: 'blossom', label: '🌸' }
+          { x: 1370, y: 348, w: 60, h: 24, type: 'blossom', label: '🌸' }
         ]
       },
       final: {
@@ -1288,18 +1291,18 @@
           [320, 300, 180, 18],
           [600, 250, 190, 18],
           [900, 290, 180, 18],
-          [1200, 240, 200, 18],
-          [1500, 290, 180, 18],
-          [1800, 240, 200, 18],
-          [2040, 290, 120, 18] // Shortened final jump platform before ground wedding gate
+          [1180, 280, 140, 18], // Drop-off towards spring
+          [1500, 260, 180, 18], // Landing platform after true love boost
+          [1780, 240, 190, 18],
+          [2040, 290, 120, 18]  // Shortened final jump platform before ground wedding gate
         ],
         coins: [
           [690, 200],   // 1. Heart
-          [1300, 190],  // 2. Love Letter
+          [1410, 150],  // 2. Love Letter (High air launch target!)
           [1890, 190]   // 3. Marriage Ring
         ],
         springs: [
-          { x: 1340, y: 352, w: 46, h: 20, type: 'heart', label: '💖' }
+          { x: 1370, y: 348, w: 60, h: 24, type: 'heart', label: '💖' }
         ]
       }
     };
@@ -1435,25 +1438,24 @@
     // Specialty Springboards Collision & High Boost Launch
     if(g.springs){
       for(const sp of g.springs){
-        const wasAbove = oldY + p.h <= sp.y + 10;
-        const nowCross = p.y + p.h >= sp.y && p.y + p.h <= sp.y + 32;
-        const overlapX = p.x + p.w > sp.x && p.x < sp.x + sp.w;
-        if(p.vy >= 0 && wasAbove && nowCross && overlapX){
+        const overlapX = (p.x + p.w > sp.x - 6) && (p.x < sp.x + sp.w + 6);
+        const overlapY = (p.y + p.h >= sp.y - 12) && (p.y <= sp.y + sp.h + 12);
+        if(overlapX && overlapY && p.vy >= -4){
           p.y = sp.y - p.h;
-          p.vy = -14.4;
+          p.vy = -14.8;
           p.onGround = false;
           p.coyote = 0;
           p.canDoubleJump = true;
           playSFX('spring');
           if(sp.type==='steamer'){
-            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'🥟 💨'});
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:26, label:'🥟 💨'});
           } else if(sp.type==='train'){
-            p.vx = 4.6;
-            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'⚡ 🚄'});
+            p.vx = 4.8;
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:26, label:'⚡ 🚄'});
           } else if(sp.type==='blossom'){
-            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'🌸 ✨'});
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:26, label:'🌸 ✨'});
           } else {
-            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:24, label:'💖 💍'});
+            g.bursts.push({x:sp.x+sp.w/2, y:sp.y-10, life:26, label:'💖 💍'});
           }
         }
       }
@@ -1644,32 +1646,54 @@
     if(g.springs){
       g.springs.forEach(sp => {
         ctx.save();
-        ctx.fillStyle = '#2b221b';
-        ctx.fillRect(sp.x, sp.y + 14, sp.w, 6);
+        const bounceOffset = Math.sin(performance.now() / 150) * 3;
+        
+        // Floating indicator arrow above spring
         ctx.fillStyle = '#ffd166';
-        ctx.fillRect(sp.x + 8, sp.y + 8, sp.w - 16, 6);
+        ctx.font = 'bold 15px Courier New';
+        ctx.fillText('▲ BOOST', sp.x - 4, sp.y - 18 + bounceOffset);
+
+        // Heavy Base plate
+        ctx.fillStyle = '#222738';
+        ctx.fillRect(sp.x, sp.y + 14, sp.w, 10);
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(sp.x + 2, sp.y + 20, sp.w - 4, 3);
+        
+        // Metallic Spring Coils
+        ctx.fillStyle = '#e0e6ed';
+        for(let i=0; i<3; i++){
+          ctx.fillRect(sp.x + 10 + i*16, sp.y + 8, 8, 7);
+        }
+
+        // Themed Platform Top Pad with gentle bobbing
         if(sp.type === 'steamer'){
           ctx.fillStyle = '#c7975b';
-          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
+          ctx.fillRect(sp.x, sp.y + bounceOffset*0.5, sp.w, 10);
           ctx.fillStyle = '#ebd1aa';
-          ctx.fillRect(sp.x + 6, sp.y - 2, sp.w - 12, 4);
-          ctx.font = '16px serif';
-          ctx.fillText('🥟', sp.x + 13, sp.y - 5);
+          ctx.fillRect(sp.x + 4, sp.y - 3 + bounceOffset*0.5, sp.w - 8, 4);
+          ctx.font = '20px serif';
+          ctx.fillText('🥟', sp.x + sp.w/2 - 10, sp.y - 6 + bounceOffset*0.5);
         } else if(sp.type === 'train'){
           ctx.fillStyle = '#e85d04';
-          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
-          ctx.font = '16px serif';
-          ctx.fillText('🚄', sp.x + 13, sp.y - 5);
+          ctx.fillRect(sp.x, sp.y + bounceOffset*0.5, sp.w, 10);
+          ctx.fillStyle = '#ffba08';
+          ctx.fillRect(sp.x + 4, sp.y - 3 + bounceOffset*0.5, sp.w - 8, 4);
+          ctx.font = '20px serif';
+          ctx.fillText('🚄', sp.x + sp.w/2 - 10, sp.y - 6 + bounceOffset*0.5);
         } else if(sp.type === 'blossom'){
           ctx.fillStyle = '#ff8fab';
-          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
-          ctx.font = '16px serif';
-          ctx.fillText('🌸', sp.x + 13, sp.y - 5);
+          ctx.fillRect(sp.x, sp.y + bounceOffset*0.5, sp.w, 10);
+          ctx.fillStyle = '#ffe5ec';
+          ctx.fillRect(sp.x + 4, sp.y - 3 + bounceOffset*0.5, sp.w - 8, 4);
+          ctx.font = '20px serif';
+          ctx.fillText('🌸', sp.x + sp.w/2 - 10, sp.y - 6 + bounceOffset*0.5);
         } else {
           ctx.fillStyle = '#f72585';
-          ctx.fillRect(sp.x + 2, sp.y, sp.w - 4, 10);
-          ctx.font = '16px serif';
-          ctx.fillText('💖', sp.x + 13, sp.y - 5);
+          ctx.fillRect(sp.x, sp.y + bounceOffset*0.5, sp.w, 10);
+          ctx.fillStyle = '#ffb3c6';
+          ctx.fillRect(sp.x + 4, sp.y - 3 + bounceOffset*0.5, sp.w - 8, 4);
+          ctx.font = '20px serif';
+          ctx.fillText('💖', sp.x + sp.w/2 - 10, sp.y - 6 + bounceOffset*0.5);
         }
         ctx.restore();
       });
@@ -1744,8 +1768,16 @@
 
     // Render Co-op Companion (Player 2)
     if(g.encounteredP2){
-      const companionAsset = g.companionPlayer==='p2' ? ASSET_PATHS.player.player2 : ASSET_PATHS.player.idle;
-      const p2 = loadedAssets[companionAsset];
+      const isP2 = g.companionPlayer === 'p2';
+      let companionAsset;
+      if(isP2){
+        if(!p.onGround) companionAsset = ASSET_PATHS.player.player2_jump;
+        else companionAsset = (Math.floor(g.frameTick / 7) % 2 === 0) ? ASSET_PATHS.player.player2_run1 : ASSET_PATHS.player.player2_run2;
+      } else {
+        if(!p.onGround) companionAsset = ASSET_PATHS.player.jump;
+        else companionAsset = (Math.floor(g.frameTick / 7) % 2 === 0) ? ASSET_PATHS.player.run1 : ASSET_PATHS.player.run2;
+      }
+      const p2 = loadedAssets[companionAsset] || loadedAssets[isP2 ? ASSET_PATHS.player.player2 : ASSET_PATHS.player.idle];
       if(p2){
         const ph=52, pw=ph*(p2.width/p2.height);
         ctx.drawImage(p2, g.p2x, g.p2y, pw, ph);
@@ -1766,7 +1798,11 @@
     const px = Math.round(p.x), py = Math.round(p.y);
     let pose;
     if(g.mainPlayer==='p2'){
-      pose = ASSET_PATHS.player.player2;
+      if(!p.onGround) pose = ASSET_PATHS.player.player2_jump;
+      else {
+        g.frameTick++;
+        pose = (Math.floor(g.frameTick / 7) % 2 === 0) ? ASSET_PATHS.player.player2_run1 : ASSET_PATHS.player.player2_run2;
+      }
     } else {
       if(!p.onGround) pose = ASSET_PATHS.player.jump;
       else {
@@ -1774,7 +1810,7 @@
         pose = (Math.floor(g.frameTick / 7) % 2 === 0) ? ASSET_PATHS.player.run1 : ASSET_PATHS.player.run2;
       }
     }
-    const sprite = loadedAssets[pose] || loadedAssets[ASSET_PATHS.player.idle];
+    const sprite = loadedAssets[pose] || loadedAssets[g.mainPlayer==='p2' ? ASSET_PATHS.player.player2 : ASSET_PATHS.player.idle];
     if(sprite){
       const targetH = 52;
       const ratio = sprite.width / sprite.height;
