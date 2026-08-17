@@ -1011,7 +1011,7 @@
           [1420, 240, 180, 18],
           [1640, 290, 170, 18],
           [1880, 250, 190, 18],
-          [2100, 300, 160, 18]
+          [2100, 300, 260, 18] // Extended finish platform to 2360
         ],
         coins: [
           [340, 260],   // 1. Bubble Tea
@@ -1032,7 +1032,7 @@
           [1480, 240, 180, 18],
           [1700, 290, 170, 18],
           [1940, 250, 190, 18],
-          [2140, 300, 160, 18]
+          [2120, 300, 240, 18] // Extended finish platform to 2360
         ],
         coins: [
           [360, 260],   // 1. Pretzel
@@ -1053,7 +1053,7 @@
           [1440, 240, 180, 18],
           [1660, 290, 170, 18],
           [1900, 250, 190, 18],
-          [2120, 300, 160, 18]
+          [2120, 300, 240, 18] // Extended finish platform to 2360
         ],
         coins: [
           [350, 260],   // 1. Blossom
@@ -1072,7 +1072,7 @@
           [1200, 240, 200, 18],
           [1500, 290, 180, 18],
           [1800, 240, 200, 18],
-          [2080, 290, 170, 18]
+          [2080, 290, 280, 18] // Extended finish platform to 2360
         ],
         coins: [
           [690, 200],   // 1. Heart
@@ -1158,7 +1158,7 @@
   // --- Physics & Game Loop ---
   function updateGame(g,dt){
     const p=g.player;
-    const runSpeed=4.2;
+    const runSpeed=3.2; // Cozy, relaxed running speed (tuned down from 4.2)
 
     // Auto-runner: continuous forward momentum
     p.vx = runSpeed;
@@ -1172,17 +1172,17 @@
     }
     if(p.jumpBuffer > 0) p.jumpBuffer -= dt;
 
-    // Process Jump
+    // Process Jump (tuned for runSpeed 3.2)
     if(p.jumpBuffer > 0){
       if(p.onGround || p.coyote > 0){
-        p.vy = -11.6;
+        p.vy = -10.4;
         p.onGround = false;
         p.coyote = 0;
         p.jumpBuffer = 0;
         playSFX('jump');
         g.bursts.push({x:p.x+p.w/2, y:p.y+p.h, life:14, label:'✦'});
       } else if(p.canDoubleJump){
-        p.vy = -10.8;
+        p.vy = -9.6;
         p.canDoubleJump = false;
         p.jumpBuffer = 0;
         playSFX('doubleJump');
@@ -1190,8 +1190,8 @@
       }
     }
 
-    // Gravity
-    p.vy += 0.54 * dt;
+    // Gravity (tuned floaty)
+    p.vy += 0.46 * dt;
     const oldY = p.y;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
@@ -1221,7 +1221,7 @@
     g.cameraX += (targetCameraX - g.cameraX) * 0.12 * dt;
 
     // Update Progress Bar
-    const progressPct = Math.min(100, Math.max(0, (p.x / 2280) * 100));
+    const progressPct = Math.min(100, Math.max(0, (p.x / 2340) * 100));
     const fillEl = document.getElementById(g.code+'-progress-fill');
     if(fillEl) fillEl.style.width = progressPct.toFixed(1) + '%';
 
@@ -1266,8 +1266,8 @@
     if(g.encounteredP2){
       const targetP2X = Math.max(20, p.x - 52);
       const targetP2Y = p.y;
-      g.p2x += (targetP2X - g.p2x) * 0.14 * dt;
-      g.p2y += (targetP2Y - g.p2y) * 0.18 * dt;
+      g.p2x += (targetP2X - g.p2x) * 0.12 * dt;
+      g.p2y += (targetP2Y - g.p2y) * 0.16 * dt;
 
       // Occasional romance heart between couple
       if(Math.random() < 0.03 * dt){
@@ -1275,14 +1275,14 @@
       }
     }
 
-    // Stage Goal Detection (Flag at x = 2280)
+    // Stage Goal Detection (Flag further right at x = 2340)
     if(g.code==='final'){
-      if(p.x > 2260 && !g.finished){
+      if(p.x > 2300 && !g.finished){
         playSFX('win');
         finishGame(g.code, false);
       }
     } else {
-      if(p.x > 2280 && !g.finished){
+      if(p.x > 2330 && !g.finished){
         playSFX('win');
         finishGame(g.code, false);
       }
@@ -1313,29 +1313,28 @@
     const ctx=g.ctx, p=g.player, camX=g.cameraX;
     ctx.clearRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
 
-    // ================= BACKGROUND IMAGE WITH PARALLAX =================
+    // ================= BACKGROUND IMAGE (PANORAMIC SMOOTH PAN - 0 SEAMS) =================
     const bgKey = ASSET_PATHS.bg && ASSET_PATHS.bg[g.code];
     const bg = bgKey ? loadedAssets[bgKey] : null;
 
     if(bg){
-      // Parallax scrolling for background artwork across the 2400px stage
-      const bgW = VIEW_WIDTH;
-      const bgH = VIEW_HEIGHT;
-      const bgOffset = (camX * 0.35) % bgW;
+      // Panoramic cinematic pan from entrance to landmark across the 2400px stage
+      const maxCamX = Math.max(1, g.worldWidth - VIEW_WIDTH); // 1600px total camera scroll
+      const progress = Math.max(0, Math.min(1, camX / maxCamX));
+
+      // bgRenderW is 1200px (1.5x of viewport) to allow rich panning without any repeating seam lines
+      const bgRenderW = 1200;
+      const bgRenderH = VIEW_HEIGHT;
+      const bgX = - progress * (bgRenderW - VIEW_WIDTH);
 
       ctx.save();
-      // Primary tile
-      ctx.drawImage(bg, -bgOffset, 0, bgW, bgH);
-      // Secondary seamless wrap tile
-      if(bgW - bgOffset < VIEW_WIDTH){
-        ctx.drawImage(bg, bgW - bgOffset, 0, bgW, bgH);
-      }
+      ctx.drawImage(bg, bgX, 0, bgRenderW, bgRenderH);
       ctx.restore();
 
       // Atmospheric dynamic overlays
       if(g.code==='tw'){
         // High Speed Rail Bullet Train animation
-        g.trainX += 1.6; if(g.trainX > g.worldWidth + 200) g.trainX = -220;
+        g.trainX += 1.3; if(g.trainX > g.worldWidth + 200) g.trainX = -220;
         const trainScreenX = g.trainX - camX;
         if(trainScreenX > -250 && trainScreenX < VIEW_WIDTH + 100){
           ctx.save();
@@ -1351,8 +1350,8 @@
         ctx.save();
         ctx.fillStyle='rgba(255,188,211,.88)';
         for(let i=0; i<14; i++){
-          const px = ((i*85 + now*24 - camX*0.35) % (VIEW_WIDTH+60) + (VIEW_WIDTH+60)) % (VIEW_WIDTH+60) - 30;
-          const py = 70 + ((i*43 + now*16) % 260);
+          const px = ((i*85 + now*18 - camX*0.25) % (VIEW_WIDTH+60) + (VIEW_WIDTH+60)) % (VIEW_WIDTH+60) - 30;
+          const py = 70 + ((i*43 + now*12) % 260);
           ctx.fillRect(px, py, 5, 4);
         }
         ctx.restore();
@@ -1362,7 +1361,7 @@
         ctx.save();
         ctx.fillStyle='rgba(255,225,140,.92)';
         for(let i=0; i<12; i++){
-          const sx = ((i*80 - camX*0.35) % VIEW_WIDTH + VIEW_WIDTH) % VIEW_WIDTH;
+          const sx = ((i*80 - camX*0.25) % VIEW_WIDTH + VIEW_WIDTH) % VIEW_WIDTH;
           const sy = 60 + Math.sin(now*2+i)*18 + (i%3)*40;
           ctx.fillRect(sx, sy, 4, 4);
         }
@@ -1409,10 +1408,10 @@
       }
     });
 
-    // Render Stage Goal (Flag or Final Wedding Arch)
+    // Render Stage Goal (Flag further right at x = 2340 or Final Wedding Arch)
     if(g.code==='final'){
-      // Grand Wedding Flower Arch / Ring Gate at x = 2260
-      const gx = 2220, gy = 190, gw = 96, gh = 130;
+      // Grand Wedding Flower Arch / Ring Gate at x = 2270
+      const gx = 2270, gy = 190, gw = 96, gh = 130;
       ctx.save();
       ctx.strokeStyle='#9d7b59'; ctx.lineWidth=8;
       ctx.beginPath(); ctx.arc(gx+gw/2, gy+gh/2, gw/2-6, Math.PI*1.03, Math.PI*1.97); ctx.stroke();
@@ -1434,14 +1433,14 @@
       }
       ctx.restore();
     } else {
-      // Goal Flag at x = 2280
+      // Goal Flag at x = 2340 (Right on the extended finish platform)
       const flagImg = loadedAssets[ASSET_PATHS.ui.flag];
       if(flagImg){
         const fh=80, fw=fh*(flagImg.width/flagImg.height);
-        ctx.drawImage(flagImg, 2280 - fw/2, 292, fw, fh);
+        ctx.drawImage(flagImg, 2340 - fw/2, 292, fw, fh);
       } else {
-        ctx.fillStyle='#363b4f'; ctx.fillRect(2280, 278, 8, 94);
-        ctx.fillStyle='#e96a7a'; ctx.beginPath(); ctx.moveTo(2288, 282); ctx.lineTo(2316, 292); ctx.lineTo(2288, 304); ctx.closePath(); ctx.fill();
+        ctx.fillStyle='#363b4f'; ctx.fillRect(2340, 278, 8, 94);
+        ctx.fillStyle='#e96a7a'; ctx.beginPath(); ctx.moveTo(2348, 282); ctx.lineTo(2376, 292); ctx.lineTo(2348, 304); ctx.closePath(); ctx.fill();
       }
     }
 
