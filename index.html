@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#16213e" />
-  <title>Our Story Adventure</title>
+  <title>Our Story Adventure — Mira & Eric Wedding</title>
   <style>
     :root{
       --ink:#18213a; --cream:#fff7e6; --sky:#8fd7ff; --grass:#63b75d;
@@ -15,7 +15,7 @@
       --green:#79b96f; --paper:#fffaf0; --shadow:#0e1528;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:"Courier New",monospace;background:#10172a;color:var(--ink)}
+    html,body{margin:0;min-height:100%;font-family:"Courier New",monospace,"PingFang TC","Microsoft JhengHei",sans-serif;background:#10172a;color:var(--ink)}
     button,input,textarea{font:inherit}
     body{display:flex;justify-content:center}
     #app{
@@ -40,9 +40,12 @@
       width:100%; border:4px solid var(--ink); border-radius:8px; padding:14px 16px;
       background:var(--pink); color:white; font-weight:800; text-transform:uppercase;
       box-shadow:5px 5px 0 var(--shadow); cursor:pointer; transition:.12s transform,.12s box-shadow;
+      display:inline-flex; align-items:center; justify-content:center; text-decoration:none;
     }
     .btn:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--shadow)}
     .btn.secondary{background:var(--blue)}
+    .btn.gold{background:var(--gold);color:var(--ink)}
+    .btn.green{background:#2fae67}
     .hero-scene{
       flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;
       background:
@@ -58,8 +61,8 @@
     }
     .hero-copy{
       position:relative;z-index:2;max-width:70%;padding:20px 20px 18px;
-      background:rgba(255,247,230,.82);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--shadow);
-      text-align:center;backdrop-filter: blur(1px); border-radius:10px;
+      background:rgba(255,247,230,.88);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--shadow);
+      text-align:center;backdrop-filter: blur(2px); border-radius:10px;
     }
     .hero-kicker{font-size:12px;letter-spacing:1px;font-weight:800;margin-bottom:8px;opacity:.88}
     .hero-subline{font-size:13px;margin-top:8px;opacity:.92}
@@ -72,14 +75,8 @@
     .player-choice small{display:block;font-size:9px;margin-top:3px;opacity:.75}
     .start-choice-note{position:relative;z-index:3;margin-top:10px;padding:7px 10px;background:rgba(255,247,230,.9);border:3px solid var(--ink);font-size:11px;font-weight:800;pointer-events:none}
     .reset-link{display:block;margin:8px auto 0;border:0;background:transparent;text-decoration:underline;font:inherit;font-size:10px;opacity:.65;cursor:pointer}
-    /* ==============================================================
-       WORLD MAP STATE LAYER — v21
-       --------------------------------------------------------------
-       The painted map contains baked green ticks. Interactive state is
-       rendered by separate percentage-positioned badges, NOT by button
-       pseudo-elements. Because both position and size scale with the map,
-       the live badge always fully covers the baked marker.
-       ============================================================== */
+
+    /* WORLD MAP LAYER */
     .node::before,.node::after{content:none!important;display:none!important}
     .map-status{
       position:absolute;
@@ -104,29 +101,18 @@
     .map-status[data-state='play']{background:#ffd166}
     .map-status[data-state='done']{background:#2fae67;color:white}
 
-    /* Exact centres measured from the original 540×678 map artwork. */
     #status-de{left:32.02%;top:18.54%}
     #status-kr{left:81.83%;top:36.18%}
     #status-tw{left:31.44%;top:68.27%}
-    /* Final Quest has no baked tick; this is its card's upper-right corner. */
     #status-final{left:90.15%;top:80.60%}
 
     .node:focus,.node:focus-visible{outline:none!important}
     .node.locked{cursor:not-allowed}
-    .final-couple{display:flex;align-items:end;justify-content:center;gap:12px;margin:10px 0}
-    .final-couple img{height:72px;width:auto;image-rendering:pixelated;filter:drop-shadow(3px 3px 0 #0005)}
-    .final-heart{font-size:28px;color:#ff7f9f;margin-bottom:12px}
-    .route-summary{font-size:11px;opacity:.85;margin:8px auto 0;max-width:360px}
-    .cloud{display:none}
-    .c1{left:8%;top:9%}.c2{right:8%;top:22%}
-    .couple{display:none}
-    .tiny-note{font-size:12px;opacity:.72;text-align:center;margin:8px 0 0}
     .map-wrap{
       flex:none;width:100%;border:4px solid var(--ink);
       background:url('assets/backgrounds/world-map.png') center/cover no-repeat;
       position:relative;overflow:hidden;min-height:0;aspect-ratio:540 / 678;border-radius:10px;box-shadow:6px 6px 0 var(--shadow);background-size:100% 100%;background-position:center;background-repeat:no-repeat;
     }
-    .map-continent,.route,.map-legend,.avatar{display:none}
     .node{
       position:absolute;border:none;background:transparent;padding:0;border-radius:18px;
       box-shadow:none;font-weight:800;cursor:pointer;text-align:center;min-width:auto;
@@ -134,612 +120,209 @@
     }
     .node:hover,.node:focus-visible{background:transparent!important;outline:none!important}
     .node.locked{filter:none;opacity:1;cursor:not-allowed}
-    /* Hotspots now match the printed cards in the world-map artwork. */
     #node-de{left:15.6%;top:17.6%;width:17.8%;height:12.3%}
     #node-kr{left:66.6%;top:35.5%;width:17.3%;height:12.1%}
     #node-tw{left:14.9%;top:67.5%;width:17.9%;height:12.7%}
     #node-final{left:66.2%;top:79.9%;width:24.7%;height:9.7%}
+
     .level-banner{padding:11px;border:4px solid var(--ink);text-align:center;box-shadow:4px 4px 0 #0005;margin-bottom:12px}
     .level-banner.tw{background:#ffd166}.level-banner.de{background:#6eb2e8}.level-banner.kr{background:#ad8bd3}.level-banner.final{background:#ed7b8a}
-    .platform-scene{
-      flex:1;min-height:500px;border:4px solid var(--ink);position:relative;overflow:hidden;
-      background:linear-gradient(#93d8ff 0 68%,#eaf7ff 68%);
-    }
-    .skyline{position:absolute;left:0;right:0;bottom:0;height:36%;display:flex;align-items:flex-end;justify-content:space-around;padding:0 14px 18px;color:#314c6b;font-size:58px;opacity:.7}
-    .plat{position:absolute;height:18px;background:#6db85f;border:4px solid #355e32;border-bottom:8px solid #8c5a37;border-radius:3px}
-    .p1{left:6%;right:36%;top:22%}.p2{left:34%;right:5%;top:48%}.p3{left:8%;right:18%;top:71%}
-    .item{position:absolute;font-size:44px;filter:drop-shadow(3px 3px 0 #0003)}
-    .storybox{border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:12px;line-height:1.5;box-shadow:4px 4px 0 #0004}
-    .storybox strong{display:block;margin-bottom:5px}
-    .progress{display:flex;gap:6px;justify-content:center;margin:10px 0}
-    .pip{width:18px;height:18px;border:3px solid var(--ink);background:#fff}.pip.on{background:var(--pink)}
-    .final-wrap{
-      flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
-      border:4px solid var(--ink);background:radial-gradient(circle at center,#304a7a 0,#15223e 65%,#0c1326 100%);
-      color:#fff;min-height:560px;padding:22px;position:relative;overflow:hidden;
-    }
-    .spark{position:absolute;font-size:26px;animation:twinkle 1.6s infinite alternate}
-    @keyframes twinkle{to{transform:scale(1.35) rotate(10deg);opacity:.45}}
-    .ring{font-size:92px;filter:drop-shadow(0 0 18px #ffd166)}
-    .big-reveal{font-size:40px;line-height:1.05;color:#ffd166;text-shadow:4px 4px 0 #000;margin:10px 0 18px}
-    .guestbook{display:grid;gap:12px}
-    .guestbook textarea,.guestbook input{
-      width:100%;border:4px solid var(--ink);background:white;padding:12px;border-radius:6px;
-    }
-    .guestbook textarea{min-height:120px;resize:vertical}
-    .messages{display:grid;gap:10px;margin-top:16px}
-    .msg{background:#fff;border:3px solid var(--ink);padding:10px;box-shadow:3px 3px 0 #0004}
-    .msg b{display:block;margin-bottom:5px}
-    .navback{background:none;border:0;font-weight:800;color:var(--ink);cursor:pointer;padding:0}
-    .footer-note{font-size:11px;text-align:center;opacity:.68;margin-top:12px}
-    @media (min-width:700px){
-      body{padding:24px}
-      #app{min-height:860px;border-radius:24px}
-      .screen{min-height:860px}
-    }
-  
-    /* --- Playable mini-platformer --- */
+
+    /* --- Auto-runner Platformer Engine UI --- */
     .game-shell{
       border:4px solid var(--ink); background:#0b1732; box-shadow:4px 4px 0 #0005;
-      margin-bottom:12px; overflow:hidden; position:relative;
+      margin-bottom:10px; overflow:hidden; position:relative; border-radius:10px;
     }
     .game-hud{
       display:flex;justify-content:space-between;align-items:center;
       padding:8px 10px;background:#fff8e8;border-bottom:4px solid var(--ink);
       font-weight:800;font-size:12px;
     }
+    .hud-progress-wrap{
+      display:flex;align-items:center;gap:6px;flex:1;margin:0 12px;
+    }
+    .hud-progress-bar{
+      flex:1;height:8px;background:#ddd;border:2px solid var(--ink);border-radius:6px;overflow:hidden;position:relative;
+    }
+    .hud-progress-fill{
+      height:100%;width:0%;background:var(--pink);transition:width .1s linear;
+    }
     .game-canvas{
       display:block;width:100%;height:auto;aspect-ratio:16/9;
-      background:#8fd7ff;touch-action:none;image-rendering:pixelated;
+      background:#8fd7ff;touch-action:none;image-rendering:pixelated;cursor:pointer;
     }
     .game-help{
-      display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
-      padding:8px;background:#ffffff;border-top:4px solid var(--ink);font-size:11px;font-weight:700;
+      display:flex;justify-content:center;gap:8px;flex-wrap:wrap;align-items:center;
+      padding:7px;background:#ffffff;border-top:4px solid var(--ink);font-size:11px;font-weight:700;
     }
-    .game-controls{
-      display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0 2px;
-      user-select:none;-webkit-user-select:none;
+
+    /* Auto-runner One-Touch Controls */
+    .runner-controls{
+      margin:8px 0; user-select:none; -webkit-user-select:none;
     }
-    .control-btn{
-      min-height:58px;border:4px solid var(--ink);border-radius:10px;background:#fff;
-      box-shadow:4px 4px 0 var(--shadow);font-size:24px;font-weight:900;touch-action:none;cursor:pointer;
+    .runner-jump-btn{
+      width:100%; min-height:64px; border:4px solid var(--ink); border-radius:12px;
+      background:linear-gradient(180deg,#ffd670,#f7bd45); color:var(--ink);
+      box-shadow:4px 4px 0 var(--shadow); font-weight:900; touch-action:manipulation;
+      cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      transition:.1s transform,.1s box-shadow; padding:8px 14px;
     }
-    .control-btn.jump{background:#ffd166}
-    .control-btn:active,.control-btn.pressed{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+    .runner-jump-btn:active, .runner-jump-btn.pressed{
+      transform:translate(3px,3px); box-shadow:1px 1px 0 var(--shadow);
+    }
+    .runner-btn-main{
+      display:flex; align-items:center; gap:8px; font-size:20px; letter-spacing:1px;
+    }
+    .runner-btn-sub{
+      font-size:11px; font-weight:700; opacity:.85; margin-top:2px;
+    }
+
+    .storybox{border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:10px;line-height:1.5;box-shadow:4px 4px 0 #0004;border-radius:8px}
+    .storybox strong{display:block;margin-bottom:5px}
+
+    /* Polaroid Style Memory Card */
+    .polaroid-card{
+      display:none; margin-top:14px; background:#fff; border:4px solid var(--ink);
+      padding:16px 16px 14px; box-shadow:6px 6px 0 #0005; border-radius:4px;
+      transform:rotate(-1deg); animation:polaroidPop .35s ease-out both;
+    }
+    .polaroid-card.show{display:block}
+    @keyframes polaroidPop{
+      0%{transform:scale(.92) rotate(-3deg);opacity:0}
+      100%{transform:scale(1) rotate(-1deg);opacity:1}
+    }
+    .polaroid-header{
+      display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;
+    }
+    .polaroid-badge{
+      background:#ffd166; border:2px solid var(--ink); padding:4px 8px; font-weight:900; font-size:11px; border-radius:4px;
+    }
+    .polaroid-stamp{
+      font-size:22px; filter:drop-shadow(2px 2px 0 #0002);
+    }
+    .polaroid-body{
+      background:#fffaf0; border:2px dashed #cca; padding:12px; font-size:13px; line-height:1.6; margin-bottom:12px; border-radius:4px;
+    }
+    .polaroid-body h3{margin:0 0 6px; font-size:16px; color:var(--ink)}
+
     .finish-panel{
-      display:none;border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:10px;
-      text-align:center;box-shadow:4px 4px 0 #0004;
+      display:none;border:4px solid var(--ink);background:#fff8e8;padding:14px;margin-top:12px;
+      text-align:center;box-shadow:4px 4px 0 #0004;border-radius:8px;
     }
     .finish-panel.show{display:block}
-    .finish-panel .score{font-size:22px;font-weight:900;color:#c47b00;margin-bottom:8px}
+    .finish-panel .score{font-size:20px;font-weight:900;color:#c47b00;margin-bottom:6px}
     .skip-link{
       display:block;margin:8px auto 0;border:0;background:transparent;text-decoration:underline;
       color:var(--ink);font-size:11px;cursor:pointer;opacity:.65;
     }
 
-
-    /* v5 visual polish */
-    .memory-card{
-      display:none;
-      margin-top:12px;
-      border:4px solid var(--ink);
-      background:linear-gradient(180deg,#fff7df,#f8e3b1);
-      box-shadow:5px 5px 0 #0005;
-      overflow:hidden;
-    }
-    .memory-card.show{display:block}
-    .memory-card-head{
-      padding:10px 12px;
-      background:#18213a;
-      color:#fff;
-      font-weight:900;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .memory-card-body{padding:14px;line-height:1.5}
-    .memory-badge{
-      display:inline-block;
-      border:3px solid var(--ink);
-      padding:5px 8px;
-      background:#ffd166;
-      font-size:11px;
-      font-weight:900;
-      margin-bottom:9px;
-    }
-    .level-tip{
-      margin:8px 0 0;
-      font-size:11px;
-      opacity:.72;
-      text-align:center;
-    }
-
-
-    .asset-status{display:none!important;
-      font-size:10px;padding:4px 7px;border:2px solid var(--ink);border-radius:6px;
-      background:#fff;font-weight:900;margin-left:6px
-    }
-    .asset-status.ok{background:#b9efc5}
-    .asset-status.bad{background:#ffb3bd}
-
-
-    @keyframes collectiblePulse {
-      0% { transform:scale(1); }
-      50% { transform:scale(1.12); }
-      100% { transform:scale(1); }
-    }
-
-
-    .quest-note{
-      margin:8px 0 0;
-      font-size:11px;
-      opacity:.74;
-      text-align:center;
-      font-weight:700;
-    }
+    /* Final Reveal & Wedding Features */
     .reveal-card{
-      display:none;
-      margin-top:12px;
-      border:4px solid var(--ink);
+      display:none; margin-top:14px; border:4px solid var(--ink);
       background:radial-gradient(circle at top, #233a68 0, #15223e 55%, #0d1324 100%);
-      color:#fff;
-      text-align:center;
-      box-shadow:5px 5px 0 #0005;
-      padding:18px 16px;
+      color:#fff; text-align:center; box-shadow:5px 5px 0 #0005; padding:20px 16px; border-radius:10px;
     }
-    .reveal-card.show{display:block}
+    .reveal-card.show{display:block; animation:endingPop .4s ease-out both}
     .reveal-card .mini{font-size:12px;letter-spacing:1px;font-weight:900;color:#ffd166}
-    .reveal-card .big{font-size:34px;line-height:1.05;margin:8px 0 10px;color:#ffd166;text-shadow:3px 3px 0 #000}
-    .reveal-card .line{max-width:340px;margin:0 auto 10px;line-height:1.5}
-
-    @keyframes endingPop{
-      0%{transform:scale(.965);opacity:0}
-      100%{transform:scale(1);opacity:1}
-    }
-    .reveal-card.show{animation:endingPop .34s ease-out both}
+    .reveal-card .big{font-size:36px;line-height:1.05;margin:8px 0 10px;color:#ffd166;text-shadow:3px 3px 0 #000}
+    .reveal-card .line{max-width:360px;margin:0 auto 12px;line-height:1.6;font-size:14px}
+    .final-couple{display:flex;align-items:end;justify-content:center;gap:12px;margin:12px 0}
+    .final-couple img{height:68px;width:auto;image-rendering:pixelated;filter:drop-shadow(3px 3px 0 #0005)}
+    .final-heart{font-size:28px;color:#ff7f9f;margin-bottom:12px;animation:heartBeat 1.2s infinite}
+    @keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
     .final-route-strip{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin:12px auto 6px;font-size:11px;font-weight:900}
     .final-route-stop{background:#fff8e8;color:#18213a;border:2px solid #ffd166;border-radius:999px;padding:5px 8px}
     .final-route-arrow{color:#ffd166;font-size:14px}
-    .ending-note{font-size:12px;opacity:.9;margin:8px auto 0;max-width:360px}
+    .ending-note{font-size:12px;opacity:.9;margin:10px auto 0;max-width:360px}
 
-
-    /* ==============================================================
-       MOBILE RESPONSIVE LAYER — v27
-       --------------------------------------------------------------
-       CSS-only enhancement on top of v26 stable game architecture.
-       No route, state, platform physics, collision or story logic
-       is changed here.
-       ============================================================== */
-
-    html{
-      -webkit-text-size-adjust:100%;
-      text-size-adjust:100%;
-      overscroll-behavior-y:none;
+    /* Wedding Actions Grid */
+    .wedding-actions{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;
     }
-
-    body{
-      width:100%;
-      min-width:0;
-      overflow-x:hidden;
-      -webkit-tap-highlight-color:transparent;
+    .action-btn{
+      border:3px solid var(--ink); border-radius:8px; padding:10px; font-weight:800; font-size:12px;
+      cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;
+      text-decoration:none; color:var(--ink); background:#fff; box-shadow:3px 3px 0 var(--shadow);
+      transition:.1s transform,.1s box-shadow;
     }
+    .action-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+    .action-btn.cal{background:#e8f4fd}
+    .action-btn.map{background:#eaf8ed}
+    .action-btn.rsvp{background:#fdf0f2; grid-column:span 2}
 
-    #app{
-      width:min(100%,520px);
-      max-width:100%;
+    .guestbook{display:grid;gap:12px}
+    .guestbook textarea,.guestbook input{
+      width:100%;border:4px solid var(--ink);background:white;padding:12px;border-radius:6px;
     }
-
-    button,
-    .node,
-    .player-choice,
-    .control-btn,
-    .btn,
-    .navback,
-    .reset-link{
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
+    .guestbook textarea{min-height:110px;resize:vertical}
+    .messages{display:grid;gap:10px;margin-top:16px}
+    .msg{background:#fff;border:3px solid var(--ink);padding:10px;box-shadow:3px 3px 0 #0004;border-radius:6px}
+    .msg b{display:block;margin-bottom:5px}
+    .navback{background:none;border:0;font-weight:800;color:var(--ink);cursor:pointer;padding:0}
+    .footer-note{font-size:11px;text-align:center;opacity:.68;margin-top:12px}
 
     .music-mini{
-      width:34px;
-      height:34px;
-      min-width:34px;
-      display:grid;
-      place-items:center;
-      padding:0;
-      border:2px solid var(--ink);
-      border-radius:9px;
-      background:#fff8e8;
-      color:var(--ink);
-      box-shadow:2px 2px 0 #0004;
-      font:700 15px/1 "Courier New",monospace;
-      cursor:pointer;
-      touch-action:manipulation;
-      flex:0 0 auto;
+      width:34px; height:34px; min-width:34px; display:grid; place-items:center; padding:0;
+      border:2px solid var(--ink); border-radius:9px; background:#fff8e8; color:var(--ink);
+      box-shadow:2px 2px 0 #0004; font:700 15px/1 "Courier New",monospace; cursor:pointer;
+      touch-action:manipulation; flex:0 0 auto;
     }
     .music-mini.on{background:#bdecc8}
     .music-mini.off{background:#f2e8dc}
 
-    /* iPhone / Android safe areas */
-    @supports (padding: max(0px)){
-      .screen{
-        padding-top:max(14px,env(safe-area-inset-top));
-        padding-left:max(12px,env(safe-area-inset-left));
-        padding-right:max(12px,env(safe-area-inset-right));
-        padding-bottom:max(24px,env(safe-area-inset-bottom));
-      }
-    }
-
-    /* --------------------------------------------------------------
-       PHONE PORTRAIT / NARROW SCREENS
-       -------------------------------------------------------------- */
     @media (max-width:560px){
       body{padding:0}
-      #app{
-        min-height:100dvh;
-        border-radius:0;
-        box-shadow:none;
+      #app{min-height:100dvh;border-radius:0;box-shadow:none}
+      .screen{min-height:100dvh;padding:12px 10px calc(24px + env(safe-area-inset-bottom))}
+      #tw,#de,#kr,#final{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+      .runner-controls{
+        position:sticky; bottom:max(8px,env(safe-area-inset-bottom)); z-index:30;
       }
-      .screen{
-        min-height:100dvh;
-        padding:12px 10px calc(24px + env(safe-area-inset-bottom));
-      }
-      #tw,#de,#kr,#final{
-        padding-bottom:calc(118px + env(safe-area-inset-bottom));
-      }
-
-      .topbar{
-        min-height:36px;
-        gap:8px;
-        margin-bottom:9px;
-        font-size:12px;
-      }
-      .topbar > *{min-width:0}
-      .hearts{
-        font-size:13px;
-        letter-spacing:2px;
-        white-space:nowrap;
-      }
-      .coin{
-        padding:4px 6px;
-        font-size:12px;
-        white-space:nowrap;
-      }
-      .navback{
-        min-height:34px;
-        display:flex;
-        align-items:center;
-        font-size:12px;
-        white-space:nowrap;
-      }
-
-      .title-card{
-        padding:11px 9px;
-        border-width:3px;
-        box-shadow:3px 3px 0 var(--shadow);
-      }
-      h1{
-        font-size:clamp(29px,10vw,40px);
-        text-shadow:2px 2px 0 #fff,4px 4px 0 #14213d;
-      }
-      h2{font-size:clamp(20px,6vw,25px)}
-      .sub{font-size:13px;line-height:1.42}
-
-      /* Opening screen */
-      .hero-scene{
-        min-height:500px;
-        margin:8px 0 12px;
-        border-width:3px;
-        box-shadow:4px 4px 0 var(--shadow);
-      }
-      .hero-copy{
-        max-width:88%;
-        padding:14px 12px 12px;
-        border-width:3px;
-        box-shadow:3px 3px 0 var(--shadow);
-      }
-      .hero-kicker{font-size:9px;letter-spacing:.7px}
-      .hero-subline{font-size:11px;margin-bottom:78px}
-      .hero-sprites{
-        bottom:15px;
-        padding:0 12px;
-        gap:10px;
-      }
-      .hero-sprite-card{
-        min-width:0;
-        width:clamp(104px,32vw,132px);
-        padding:6px 5px;
-        font-size:11px;
-        border-width:3px;
-      }
-      .hero-sprite-card img{width:48px}
-      .player-choice small{font-size:8px}
-      .start-choice-note{
-        position:absolute;
-        left:50%;
-        bottom:126px;
-        transform:translateX(-50%);
-        width:min(88%,310px);
-        margin:0;
-        padding:6px 8px;
-        font-size:9px;
-        text-align:center;
-        border-width:2px;
-      }
-      .btn{
-        min-height:52px;
-        padding:12px;
-        border-width:3px;
-        box-shadow:3px 3px 0 var(--shadow);
-      }
-
-      /* World map: exact art aspect ratio, no cropping */
-      .map-wrap{
-        width:100%;
-        aspect-ratio:540 / 678;
-        min-height:0!important;
-        height:auto!important;
-        background-size:100% 100%!important;
-        background-position:center!important;
-        border-width:3px;
-        box-shadow:3px 3px 0 var(--shadow);
-      }
-      .map-status{
-        border-width:3px;
-        box-shadow:1px 1px 0 #0004;
-        font-size:clamp(11px,4vw,18px);
-      }
-
-      /* Level header and HUD */
-      .level-banner{
-        padding:8px 6px;
-        margin-bottom:9px;
-        border-width:3px;
-        box-shadow:3px 3px 0 #0005;
-        font-size:13px;
-      }
-      .level-banner b{font-size:15px}
-      .game-shell{
-        border-width:3px;
-        box-shadow:3px 3px 0 #0005;
-        margin-bottom:8px;
-      }
-      .game-hud{
-        padding:7px 6px;
-        border-bottom-width:3px;
-        gap:5px;
-        font-size:10px;
-      }
-      .game-hud > span:first-child,
-      .game-hud > span:last-child{
-        flex:0 0 auto;
-        white-space:nowrap;
-      }
-      .game-hud > span:nth-child(2){
-        flex:1 1 auto;
-        min-width:0;
-        text-align:center;
-        line-height:1.15;
-      }
-
-      .game-canvas{
-        width:100%;
-        max-width:100%;
-        height:auto;
-        aspect-ratio:16 / 9;
-      }
-
-      .game-help{
-        gap:5px;
-        padding:6px 5px;
-        border-top-width:3px;
-        font-size:9px;
-        line-height:1.25;
-      }
-
-      /* Large, thumb-friendly controls.
-         Sticky keeps them reachable during a level without altering game JS. */
-      .game-controls{
-        position:sticky;
-        bottom:max(8px,env(safe-area-inset-bottom));
-        z-index:30;
-        grid-template-columns:1fr 1fr 1fr;
-        gap:8px;
-        margin:9px 0 8px;
-        padding:7px;
-        background:rgba(255,247,230,.96);
-        border:3px solid var(--ink);
-        border-radius:13px;
-        box-shadow:0 -3px 0 #0002,4px 4px 0 var(--shadow);
-        backdrop-filter:blur(4px);
-      }
-      .control-btn{
-        min-height:68px;
-        border-width:3px;
-        border-radius:10px;
-        box-shadow:3px 3px 0 var(--shadow);
-        font-size:27px;
-      }
-
-      .storybox,
-      .finish-panel,
-      .memory-card,
-      .reveal-card{
-        border-width:3px;
-        box-shadow:3px 3px 0 #0004;
-      }
-      .storybox{
-        padding:11px;
-        margin-top:9px;
-        font-size:12px;
-      }
-      .finish-panel{padding:12px}
-      .finish-panel .score{font-size:18px}
-      .memory-card-body{padding:11px;font-size:12px}
-      .reveal-card{padding:15px 11px}
-      .reveal-card .big{font-size:29px}
-
-      .final-couple img{height:58px}
-      .final-heart{font-size:24px}
-      .route-summary,.ending-note{font-size:10px}
-
-      /* Guestbook: 16px prevents iOS Safari from zooming on focus */
-      .guestbook input,
-      .guestbook textarea{
-        font-size:16px;
-        padding:11px;
-        border-width:3px;
-      }
-      .guestbook textarea{min-height:105px}
-      .msg{border-width:3px;font-size:12px}
-
-      .tiny-note,.footer-note,.level-tip{font-size:10px}
+      .runner-jump-btn{min-height:70px}
+      .runner-btn-main{font-size:22px}
     }
-
-    /* Extra-small phones (320–359 px wide) */
-    @media (max-width:359px){
-      .screen{padding-left:8px;padding-right:8px}
-      .hero-scene{min-height:470px}
-      .hero-copy{max-width:92%;padding:12px 8px}
-      .hero-sprites{padding:0 7px;gap:6px}
-      .hero-sprite-card{width:100px;font-size:10px}
-      .hero-sprite-card img{width:44px}
-      .start-choice-note{bottom:121px;font-size:8px}
-      .game-hud{font-size:9px}
-      .game-help{font-size:8px}
-      .game-controls{gap:6px;padding:6px}
-      .control-btn{min-height:64px}
-    }
-
-    /* --------------------------------------------------------------
-       PHONE LANDSCAPE / SHORT VIEWPORTS
-       Keep the same game architecture, only compact chrome.
-       -------------------------------------------------------------- */
-    @media (orientation:landscape) and (max-height:520px){
-      body{padding:0}
-      #app{
-        width:100%;
-        max-width:100%;
-        min-height:100dvh;
-        border-radius:0;
-      }
-      .screen{
-        min-height:100dvh;
-        padding:7px 10px calc(10px + env(safe-area-inset-bottom));
-      }
-      .topbar{
-        min-height:28px;
-        margin-bottom:5px;
-        font-size:11px;
-      }
-      .title-card{padding:7px}
-      .level-banner{
-        padding:5px 7px;
-        margin-bottom:6px;
-        font-size:11px;
-      }
-      .level-banner b{font-size:13px}
-
-      .hero-scene{
-        min-height:calc(100dvh - 118px);
-        margin:4px 0 6px;
-      }
-      .hero-copy{
-        max-width:54%;
-        padding:9px;
-      }
-      .hero-copy h1{font-size:28px}
-      .hero-copy .sub{font-size:10px}
-      .hero-subline{display:none}
-      .hero-sprites{
-        padding:0 18px;
-        bottom:10px;
-      }
-      .hero-sprite-card{
-        width:90px;
-        min-width:90px;
-        padding:4px;
-        font-size:9px;
-      }
-      .hero-sprite-card img{width:38px}
-      .start-choice-note{
-        bottom:96px;
-        width:270px;
-        font-size:8px;
-        padding:4px;
-      }
-
-      /* Play screen: canvas stays large, controls remain usable below it. */
-      .game-shell{
-        max-width:min(72vw,720px);
-        margin-left:auto;
-        margin-right:auto;
-      }
-      .game-controls{
-        position:static;
-        max-width:min(72vw,720px);
-        margin:6px auto;
-        padding:5px;
-      }
-      .control-btn{min-height:48px;font-size:23px}
-      .game-help{padding:4px;font-size:8px}
-      .game-hud{padding:5px 7px;font-size:9px}
-
-      .map-wrap{
-        width:min(42vw,300px);
-        max-width:100%;
-        margin:0 auto;
-      }
-
-      .storybox,.memory-card,.finish-panel,.reveal-card{
-        max-width:min(72vw,720px);
-        margin-left:auto;
-        margin-right:auto;
-      }
-    }
-
-    /* Accessibility: do not animate unnecessarily when user asks for it. */
-    @media (prefers-reduced-motion:reduce){
-      *,*::before,*::after{
-        animation-duration:.001ms!important;
-        animation-iteration-count:1!important;
-        scroll-behavior:auto!important;
-        transition-duration:.001ms!important;
-      }
-    }
-
-</style>
+  </style>
 </head>
 <body>
 <div id="app">
 
+  <!-- START / HERO SCREEN -->
   <section id="start" class="screen active">
     <div class="topbar"><div class="hearts">♥ ♥ ♥</div><div class="coin">◉ 00</div></div>
     <div class="hero-scene">
-      <div class="cloud c1">☁️</div><div class="cloud c2">☁️</div>
       <div class="hero-copy">
-        <div class="hero-kicker">INTERACTIVE MARRIAGE ANNOUNCEMENT</div>
+        <div class="hero-kicker">INTERACTIVE WEDDING INVITATION</div>
         <h1>OUR STORY<br/>ADVENTURE</h1>
         <p class="sub"><b>Two people.<br/>Three countries.<br/>One unexpected ending.</b></p>
-        <p class="hero-subline">A tiny playable story about how we got here.</p>
+        <p class="hero-subline">A playable 2D runner celebrating how we met.</p>
       </div>
       <div class="hero-sprites">
-        <button type="button" id="choose-p1" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p1')"><img id="hero-player1" alt="Player 1 pixel sprite" /><span>PLAYER 1</span><small>TAIWAN START</small></button>
-        <button type="button" id="choose-p2" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p2')"><img id="hero-player2" alt="Player 2 pixel sprite" /><span>PLAYER 2</span><small>KOREA START</small></button>
+        <button type="button" id="choose-p1" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p1')">
+          <img id="hero-player1" alt="Player 1 pixel sprite" />
+          <span>PLAYER 1</span>
+          <small>TAIWAN START</small>
+        </button>
+        <button type="button" id="choose-p2" class="hero-sprite-card player-choice" aria-pressed="false" onclick="selectPlayer('p2')">
+          <img id="hero-player2" alt="Player 2 pixel sprite" />
+          <span>PLAYER 2</span>
+          <small>KOREA START</small>
+        </button>
       </div>
       <div id="start-choice-note" class="start-choice-note">Choose whose hometown begins the story.</div>
-      <div class="couple">🧑🏻‍💻 💞 👩🏻‍🔬</div>
     </div>
     <button type="button" id="start-btn" class="btn" onclick="startAdventure()">Choose a Player ▶</button>
-    <p class="tiny-note">Same story, two possible starting points.</p><button class="reset-link" onclick="resetAdventure()">Reset story progress</button>
+    <p class="tiny-note" style="text-align:center;font-size:11px;opacity:.75;margin:8px 0 0">Same story, two possible starting points.</p>
+    <button class="reset-link" onclick="resetAdventure()">Reset story progress</button>
   </section>
 
+  <!-- WORLD MAP SCREEN -->
   <section id="map" class="screen">
     <div class="topbar"><button class="navback" onclick="go('start')">← START</button><div class="coin">◉ <span id="coins">00</span></div></div>
-    <div class="title-card" style="background:#a7d897"><h2 style="margin:0">WORLD MAP</h2><p style="margin:5px 0 0"><span id="map-route-copy">Choose a player to begin.</span></p></div>
-    <div class="map-wrap">
-      <div class="map-continent europe"></div><div class="map-continent asia"></div><div class="route"></div>
-      <div id="avatar" class="avatar">🧑🏻‍🚀</div>
+    <div class="title-card" style="background:#a7d897">
+      <h2 style="margin:0">WORLD MAP</h2>
+      <p style="margin:5px 0 0"><span id="map-route-copy">Choose a player to begin.</span></p>
+    </div>
+    <div class="map-wrap" style="margin-top:12px">
       <button id="node-tw" class="node" onclick="openLevel('tw')">🇹🇼<br/>TAIWAN<br/><small>LV.1</small></button>
       <button id="node-de" class="node locked" onclick="openLevel('de')">🇩🇪<br/>GERMANY<br/><small>LV.2</small></button>
       <button id="node-kr" class="node locked" onclick="openLevel('kr')">🇰🇷<br/>KOREA<br/><small>LV.3</small></button>
@@ -748,158 +331,207 @@
       <span id="status-kr" class="map-status" data-state="locked" aria-hidden="true">🔒</span>
       <span id="status-tw" class="map-status" data-state="locked" aria-hidden="true">🔒</span>
       <span id="status-final" class="map-status" data-state="locked" aria-hidden="true">🔒</span>
-      <div class="map-legend"><b>OUR HEROES</b><br/>Following the path, one chapter at a time.</div>
     </div>
   </section>
 
-
+  <!-- LEVEL 1: TAIWAN -->
   <section id="tw" class="screen">
-    <div class="topbar"><button class="navback" onclick="leaveGame('tw')">← MAP</button><div class="hearts">♥ ♥ ♥</div><div><span id="asset-status" class="asset-status">SPRITES…</span> <span class="coin">◉ 10</span></div></div>
+    <div class="topbar"><button class="navback" onclick="leaveGame('tw')">← MAP</button><div class="hearts">♥ ♥ ♥</div><div class="coin">◉ 10</div></div>
     <div class="level-banner tw"><b>LEVEL 1 — TAIWAN</b><span id="tw-mode-badge" style="float:right;font-size:10px;background:#18213a;color:#fff;padding:3px 6px;border-radius:4px">HOME BASE</span><br/><small>Player 1 Home Base</small></div>
 
     <div class="game-shell">
       <div class="game-hud">
         <span>🎒 <span id="tw-coin-count">0</span>/5</span>
-        <span id="tw-status">Collect 4+ story items →</span>
-        <span>🇹🇼</span>
+        <div class="hud-progress-wrap">
+          <span style="font-size:11px">🏃</span>
+          <div class="hud-progress-bar"><div id="tw-progress-fill" class="hud-progress-fill"></div></div>
+          <span style="font-size:11px">🏁</span>
+        </div>
+        <span id="tw-status">Run & Collect →</span>
       </div>
-      <canvas id="tw-game" class="game-canvas" width="800" height="450" aria-label="TAIWAN playable platform level"></canvas>
-      <div class="game-help"><span>← → Move</span><span>•</span><span>Space / ↑ Jump</span><span>•</span><span>Collect 4+ story items</span><span>•</span><span>Each level uses country-specific items</span></div>
+      <canvas id="tw-game" class="game-canvas" width="800" height="450" aria-label="TAIWAN playable auto-runner level"></canvas>
+      <div class="game-help">
+        <span>🦘 Tap Screen / Space to Jump</span>
+        <span>•</span>
+        <span>Double Tap in Air for Double Jump ✨</span>
+      </div>
     </div>
 
-    <div class="game-controls">
-      <button class="control-btn" data-game="tw" data-action="left" aria-label="Move left">←</button>
-      <button class="control-btn jump" data-game="tw" data-action="jump" aria-label="Jump">↑</button>
-      <button class="control-btn" data-game="tw" data-action="right" aria-label="Move right">→</button>
+    <div class="runner-controls">
+      <button class="runner-jump-btn" data-game="tw" data-action="jump" aria-label="Tap to Jump">
+        <span class="runner-btn-main">🦘 TAP TO JUMP</span>
+        <span class="runner-btn-sub">Tap again mid-air for Double Jump ✨</span>
+      </button>
     </div>
 
     <div class="storybox">
-      <strong>Mission 01 — Player 1's home base: Taiwan.</strong>
-      <span id="tw-story-copy">Bubble tea, high-speed rail, familiar food and a little science — a few small pieces of the place where his side of the story begins.</span>
+      <strong>Chapter 1 — Taiwan (Where his story began)</strong>
+      <span id="tw-story-copy">Bubble tea, high-speed rail, familiar food and a little science — the first pieces of the route.</span>
     </div>
 
-    <div id="tw-memory" class="memory-card">
-      <div class="memory-card-head"><span>CHAPTER 01</span><span>TAIWAN</span></div>
-      <div class="memory-card-body">
-        <span class="memory-badge">MEMORY UNLOCKED</span>
-        <h3 style="margin-bottom:7px">HOME BASE</h3>
-        <p id="tw-memory-copy" style="margin-bottom:0">A short first chapter about where part of the story began — familiar places, everyday details, and the first step toward a much bigger journey.</p>
+    <div id="tw-memory" class="polaroid-card">
+      <div class="polaroid-header">
+        <span class="polaroid-badge">🇹🇼 CHAPTER 01 CLEAR</span>
+        <span class="polaroid-stamp">🧋 🚄</span>
       </div>
+      <div class="polaroid-body">
+        <h3>MEMORY UNLOCKED: HOME BASE</h3>
+        <p id="tw-memory-copy">A short first chapter about where part of the story began — familiar places, everyday details, and the first step toward a much bigger journey.</p>
+      </div>
+      <button class="btn gold" onclick="complete('tw')">Back to World Map →</button>
     </div>
+
     <div id="tw-finish" class="finish-panel">
       <div class="score">LEVEL COMPLETE ✨</div>
       <div id="tw-finish-copy">All story items collected. The next chapter is unlocked.</div>
-      <button class="btn" style="background:#d69c19;margin-top:12px" onclick="complete('tw')">Back to World Map →</button>
+      <button class="btn" style="background:#d69c19;margin-top:12px" onclick="complete('tw')">Continue Adventure →</button>
     </div>
-    <p class="level-tip">Designed to take less than a minute.</p>
-    <button class="skip-link" onclick="finishGame('tw', true)">Not a gamer? Skip this tiny level</button>
+    <button class="skip-link" onclick="finishGame('tw', true)">Not a gamer? Skip this level</button>
   </section>
 
+  <!-- LEVEL 2: GERMANY -->
   <section id="de" class="screen">
     <div class="topbar"><button class="navback" onclick="leaveGame('de')">← MAP</button><div class="hearts">♥ ♥ ♥</div><div class="coin">◉ 20</div></div>
-    <div class="level-banner de"><b>LEVEL 2 — GERMANY</b><br/><small>Where Our Paths Crossed</small></div>
+    <div class="level-banner de"><b>LEVEL 2 — GERMANY</b><span id="de-mode-badge" style="float:right;font-size:10px;background:#18213a;color:#fff;padding:3px 6px;border-radius:4px">SOLO START</span><br/><small>Where Our Paths Crossed</small></div>
 
     <div class="game-shell">
       <div class="game-hud">
         <span>🎒 <span id="de-coin-count">0</span>/5</span>
-        <span id="de-status">Reach the flag →</span>
-        <span>🇩🇪</span>
+        <div class="hud-progress-wrap">
+          <span style="font-size:11px">🏃</span>
+          <div class="hud-progress-bar"><div id="de-progress-fill" class="hud-progress-fill"></div></div>
+          <span style="font-size:11px">🏁</span>
+        </div>
+        <span id="de-status">Run & Collect →</span>
       </div>
-      <canvas id="de-game" class="game-canvas" width="800" height="450" aria-label="GERMANY playable platform level"></canvas>
-      <div class="game-help"><span>← → Move</span><span>•</span><span>Space / ↑ Jump</span><span>•</span><span>Collect 4+ story items</span><span>•</span><span>Each level uses country-specific items</span></div>
+      <canvas id="de-game" class="game-canvas" width="800" height="450" aria-label="GERMANY playable auto-runner level"></canvas>
+      <div class="game-help">
+        <span>🦘 Tap Screen / Space to Jump</span>
+        <span>•</span>
+        <span>Keep running to meet Player 2 ♥</span>
+      </div>
     </div>
 
-    <div class="game-controls">
-      <button class="control-btn" data-game="de" data-action="left" aria-label="Move left">←</button>
-      <button class="control-btn jump" data-game="de" data-action="jump" aria-label="Jump">↑</button>
-      <button class="control-btn" data-game="de" data-action="right" aria-label="Move right">→</button>
+    <div class="runner-controls">
+      <button class="runner-jump-btn" data-game="de" data-action="jump" aria-label="Tap to Jump">
+        <span class="runner-btn-main">🦘 TAP TO JUMP</span>
+        <span class="runner-btn-sub">Tap again mid-air for Double Jump ✨</span>
+      </button>
     </div>
 
     <div class="storybox">
-      <strong>Mission 02 — Germany, where two routes became one.</strong>
+      <strong>Chapter 2 — Germany (Where our paths crossed)</strong>
       <span id="de-story-copy">What began as life in a new country became the chapter neither of us planned: the place where Player 1 and Player 2 finally met.</span>
     </div>
 
-    <div id="de-memory" class="memory-card">
-      <div class="memory-card-head"><span>CHAPTER 02</span><span>GERMANY</span></div>
-      <div class="memory-card-body">
-        <span class="memory-badge">MEMORY UNLOCKED</span>
-        <h3 style="margin-bottom:7px">PATHS CROSSED</h3>
-        <p id="de-memory-copy" style="margin-bottom:0">A new country became more than a new address. Somewhere in the middle of ordinary life, solo mode quietly became co-op.</p>
+    <div id="de-memory" class="polaroid-card">
+      <div class="polaroid-header">
+        <span class="polaroid-badge">🇩🇪 CHAPTER 02 CLEAR</span>
+        <span class="polaroid-stamp">🥨 ☕ ♥</span>
       </div>
+      <div class="polaroid-body">
+        <h3>MEMORY UNLOCKED: PATHS CROSSED</h3>
+        <p id="de-memory-copy">A new country became more than a new address. Somewhere in the middle of ordinary life, solo mode quietly became co-op.</p>
+      </div>
+      <button class="btn gold" onclick="complete('de')">Back to World Map →</button>
     </div>
+
     <div id="de-finish" class="finish-panel">
       <div class="score">LEVEL COMPLETE ✨</div>
       <div id="de-finish-copy">All story items collected. The next chapter is unlocked.</div>
-      <button class="btn" style="background:#4e8dd9;margin-top:12px" onclick="complete('de')">Back to World Map →</button>
+      <button class="btn" style="background:#4e8dd9;margin-top:12px" onclick="complete('de')">Continue Adventure →</button>
     </div>
-    <button class="skip-link" onclick="finishGame('de', true)">Not a gamer? Skip this tiny level</button>
+    <button class="skip-link" onclick="finishGame('de', true)">Not a gamer? Skip this level</button>
   </section>
 
+  <!-- LEVEL 3: KOREA -->
   <section id="kr" class="screen">
     <div class="topbar"><button class="navback" onclick="leaveGame('kr')">← MAP</button><div class="hearts">♥ ♥ ♥</div><div class="coin">◉ 30</div></div>
-    <div class="level-banner kr"><b>LEVEL 3 — KOREA</b><span id="kr-mode-badge" style="float:right;font-size:10px;background:#18213a;color:#fff;padding:3px 6px;border-radius:4px">HOME BASE</span><br/><small>Player 2 Home Base</small></div>
+    <div class="level-banner kr"><b>LEVEL 3 — KOREA</b><span id="kr-mode-badge" style="float:right;font-size:10px;background:#18213a;color:#fff;padding:3px 6px;border-radius:4px">CO-OP MODE</span><br/><small>Player 2 Home Base & Shared Memories</small></div>
 
     <div class="game-shell">
       <div class="game-hud">
         <span>🎒 <span id="kr-coin-count">0</span>/5</span>
-        <span id="kr-status">Reach the flag →</span>
-        <span>🇰🇷</span>
+        <div class="hud-progress-wrap">
+          <span style="font-size:11px">👫</span>
+          <div class="hud-progress-bar"><div id="kr-progress-fill" class="hud-progress-fill"></div></div>
+          <span style="font-size:11px">🏁</span>
+        </div>
+        <span id="kr-status">Run Together →</span>
       </div>
-      <canvas id="kr-game" class="game-canvas" width="800" height="450" aria-label="KOREA playable platform level"></canvas>
-      <div class="game-help"><span>← → Move</span><span>•</span><span>Space / ↑ Jump</span><span>•</span><span>Collect 4+ story items</span><span>•</span><span>Each level uses country-specific items</span></div>
+      <canvas id="kr-game" class="game-canvas" width="800" height="450" aria-label="KOREA playable auto-runner level"></canvas>
+      <div class="game-help">
+        <span>🌸 Running together in Co-op Mode!</span>
+        <span>•</span>
+        <span>Tap to Jump</span>
+      </div>
     </div>
 
-    <div class="game-controls">
-      <button class="control-btn" data-game="kr" data-action="left" aria-label="Move left">←</button>
-      <button class="control-btn jump" data-game="kr" data-action="jump" aria-label="Jump">↑</button>
-      <button class="control-btn" data-game="kr" data-action="right" aria-label="Move right">→</button>
+    <div class="runner-controls">
+      <button class="runner-jump-btn" data-game="kr" data-action="jump" aria-label="Tap to Jump">
+        <span class="runner-btn-main">🦘 TAP TO JUMP</span>
+        <span class="runner-btn-sub">Tap again mid-air for Double Jump ✨</span>
+      </button>
     </div>
 
     <div class="storybox">
-      <strong>Mission 03 — Player 2's home base: Korea.</strong>
-      <span id="kr-story-copy">Family, food, flights and familiar places from her side of the story — whether this is where the adventure starts or the home we visit together later.</span>
+      <strong>Chapter 3 — Korea (Our shared map)</strong>
+      <span id="kr-story-copy">Family, food, flights and familiar places — visited and celebrated together.</span>
     </div>
 
-    <div id="kr-memory" class="memory-card">
-      <div class="memory-card-head"><span>CHAPTER 03</span><span>KOREA</span></div>
-      <div class="memory-card-body">
-        <span class="memory-badge">MEMORY UNLOCKED</span>
-        <h3 style="margin-bottom:7px">OUR WORLD GREW</h3>
-        <p id="kr-memory-copy" style="margin-bottom:0">Family, food, flights and new memories. By this point, the map no longer felt like separate countries — it started to feel like one shared world.</p>
+    <div id="kr-memory" class="polaroid-card">
+      <div class="polaroid-header">
+        <span class="polaroid-badge">🇰🇷 CHAPTER 03 CLEAR</span>
+        <span class="polaroid-stamp">🌸 ✈️ 🍚</span>
       </div>
+      <div class="polaroid-body">
+        <h3>MEMORY UNLOCKED: OUR WORLD GREW</h3>
+        <p id="kr-memory-copy">Family, food, flights and new memories. By this point, the map no longer felt like separate countries — it started to feel like one shared world.</p>
+      </div>
+      <button class="btn gold" onclick="complete('kr')">Unlock Final Chapter →</button>
     </div>
+
     <div id="kr-finish" class="finish-panel">
       <div class="score">LEVEL COMPLETE ✨</div>
-      <div id="kr-finish-copy">All story items collected. The next chapter is unlocked.</div>
-      <button class="btn" style="background:#7655a8;margin-top:12px" onclick="complete('kr')">Back to World Map →</button>
+      <div id="kr-finish-copy">All story items collected. The final chapter is unlocked.</div>
+      <button class="btn" style="background:#7655a8;margin-top:12px" onclick="complete('kr')">To Final Quest →</button>
     </div>
-    <button class="skip-link" onclick="finishGame('kr', true)">Not a gamer? Skip this tiny level</button>
+    <button class="skip-link" onclick="finishGame('kr', true)">Not a gamer? Skip this level</button>
   </section>
 
+  <!-- LEVEL 4: FINAL QUEST -->
   <section id="final" class="screen">
     <div class="topbar"><button class="navback" onclick="leaveGame('final')">← MAP</button><div class="hearts">♥ ♥ ♥</div><div class="coin">◉ 50</div></div>
-    <div class="level-banner final"><b>FINAL QUEST — MAKE IT OFFICIAL</b><br/><small>Co-op ending stage</small></div>
+    <div class="level-banner final"><b>FINAL QUEST — MAKE IT OFFICIAL</b><br/><small>Co-op Grand Finale</small></div>
 
     <div class="game-shell">
       <div class="game-hud">
         <span>💍 <span id="final-coin-count">0</span>/3</span>
-        <span id="final-status">Collect 2+ love items →</span>
-        <span>✨</span>
+        <div class="hud-progress-wrap">
+          <span style="font-size:11px">👫</span>
+          <div class="hud-progress-bar"><div id="final-progress-fill" class="hud-progress-fill"></div></div>
+          <span style="font-size:11px">💍</span>
+        </div>
+        <span id="final-status">Collect love items →</span>
       </div>
-      <canvas id="final-game" class="game-canvas" width="800" height="450" aria-label="Final quest playable platform level"></canvas>
-      <div class="game-help"><span>← → Move</span><span>•</span><span>Space / ↑ Jump</span><span>•</span><span>Reach the ring gate together</span></div>
+      <canvas id="final-game" class="game-canvas" width="800" height="450" aria-label="Final quest playable auto-runner level"></canvas>
+      <div class="game-help">
+        <span>✨ Reach the Marriage Ring Gate together!</span>
+        <span>•</span>
+        <span>Tap to Jump</span>
+      </div>
     </div>
 
-    <div class="game-controls">
-      <button class="control-btn" data-game="final" data-action="left" aria-label="Move left">←</button>
-      <button class="control-btn jump" data-game="final" data-action="jump" aria-label="Jump">↑</button>
-      <button class="control-btn" data-game="final" data-action="right" aria-label="Move right">→</button>
+    <div class="runner-controls">
+      <button class="runner-jump-btn" data-game="final" data-action="jump" aria-label="Tap to Jump">
+        <span class="runner-btn-main">🦘 TAP TO JUMP</span>
+        <span class="runner-btn-sub">Tap again mid-air for Double Jump ✨</span>
+      </button>
     </div>
 
     <div class="storybox">
-      <strong>Final Quest — same ending, whichever route you chose.</strong>
-      One last short co-op stage. Collect a few love items, reach the ring gate together, and make the ending official.
+      <strong>Final Quest — Making it official.</strong>
+      Collect the love items, run through the star-lit sky, and reach the wedding gate together!
     </div>
 
     <div id="final-reveal" class="reveal-card">
@@ -907,8 +539,25 @@
       <div class="big" id="final-headline">WE GOT<br/>MARRIED</div>
       <div class="final-couple"><img id="final-player1" alt="Player 1"/><span class="final-heart">♥</span><img id="final-player2" alt="Player 2"/></div>
       <p class="line" id="final-announcement">We are not planning a big wedding or a grand ceremony. But you are part of our story, so we still wanted to share this happy little chapter with you.</p>
+      
       <div id="final-route-visual" class="final-route-strip"></div>
       <p id="final-route-summary" class="route-summary"></p>
+
+      <!-- Wedding Action Buttons -->
+      <div class="wedding-actions">
+        <button class="action-btn cal" onclick="addToCalendar()">
+          <span style="font-size:20px">📅</span>
+          <span>Add to Calendar</span>
+        </button>
+        <a id="venue-map-link" class="action-btn map" href="https://maps.google.com" target="_blank" rel="noopener">
+          <span style="font-size:20px">📍</span>
+          <span>Venue Map</span>
+        </a>
+        <a id="rsvp-link" class="action-btn rsvp" href="#guestbook" onclick="go('guestbook')">
+          <span style="font-size:18px">💌 Leave a Blessing / RSVP</span>
+        </a>
+      </div>
+
       <p class="ending-note" id="final-thanks">Thanks for playing through a small piece of our story. ♥</p>
     </div>
 
@@ -917,30 +566,93 @@
       <div id="final-finish-copy">The ending is unlocked.</div>
       <button class="btn" style="margin-top:12px" onclick="go('guestbook')">Continue to Guestbook →</button>
     </div>
-    <p class="quest-note">One last short stage — then the real announcement.</p>
   </section>
 
+  <!-- GUESTBOOK SCREEN -->
   <section id="guestbook" class="screen">
     <div class="topbar"><button class="navback" onclick="go('final')">← BACK</button><div>📖 GUESTBOOK</div></div>
     <div class="title-card" style="background:#d7ecff">
       <h2 style="margin-bottom:6px">ONE LAST SIDE QUEST</h2>
-      <p style="margin:0">Leave a message for Player 1 & Player 2.</p>
+      <p style="margin:0">Leave a warm message or blessing for Mira & Eric.</p>
     </div>
     <div class="guestbook" style="margin-top:16px">
-      <input id="guestName" maxlength="30" placeholder="Your name" />
-      <textarea id="guestMsg" maxlength="240" placeholder="Write something for us..."></textarea>
-      <button class="btn secondary" onclick="saveMessage()">Save Message</button>
+      <input id="guestName" maxlength="30" placeholder="Your name (你的名字)" />
+      <textarea id="guestMsg" maxlength="240" placeholder="Write something sweet for us... (寫下一句祝福)"></textarea>
+      <button class="btn secondary" onclick="saveMessage()">Send Message ✨</button>
     </div>
     <div id="messages" class="messages"></div>
-    <p class="footer-note">MVP note: messages are stored only in this browser using localStorage.</p>
+    <p class="footer-note">Messages are stored locally in this browser.</p>
   </section>
 
 </div>
+
 <audio id="custom-bgm" preload="none"></audio>
+
 <script>
-  // v26 uses a fresh storage namespace so old test progress cannot leak into this build.
-  const STORAGE_KEY='storyProgressV26';
-  const STATE_VERSION=26;
+  // ================================================================
+  // ✏️ CUSTOMIZE HERE
+  // ================================================================
+  const CUSTOMIZE_HERE = {
+    playerNames: {
+      p1: 'Eric (Player 1)',
+      p2: 'Mira (Player 2)'
+    },
+
+    weddingInfo: {
+      title: 'Mira & Eric Wedding Celebration',
+      date: '2026-10-10',
+      startTime: '12:00',
+      endTime: '15:00',
+      location: 'Taipei, Taiwan',
+      description: 'Join us in celebrating our story together!',
+      mapUrl: 'https://maps.google.com',
+      rsvpUrl: null // Set to Google Form URL if applicable
+    },
+
+    story: {
+      p1: {
+        tw: 'This is Eric’s starting point: bubble tea, high-speed rail, familiar food and a little science — the first pieces of the route.',
+        de: 'Germany is where Eric’s solo route changes: somewhere in ordinary life, Mira appears and the story becomes co-op.',
+        kr: 'Now the route reaches Mira’s home base: family, food, flights and familiar places — this time visited together.',
+        twMemory: 'Home base for Eric — the point where this route begins before crossing continents.',
+        deMemory: 'Germany became more than a new address: this is where Mira appeared and solo mode quietly became co-op.',
+        krMemory: 'Mira’s home base becomes part of a shared map — family, food, travel and memories collected together.'
+      },
+      p2: {
+        kr: 'This is Mira’s starting point: family, food, familiar places and the first chapter of her route.',
+        de: 'Germany is where Mira’s solo route changes: somewhere in ordinary life, Eric appears and the story becomes co-op.',
+        tw: 'Now the route reaches Eric’s home base: bubble tea, high-speed rail, familiar food and a little science — this time visited together.',
+        krMemory: 'Home base for Mira — the point where this route begins before crossing continents.',
+        deMemory: 'Germany became more than a new address: this is where Eric appeared and solo mode quietly became co-op.',
+        twMemory: 'Eric’s home base becomes part of a shared map — familiar food, trains, science and memories collected together.'
+      }
+    },
+
+    final: {
+      headlineHTML: 'WE GOT<br/>MARRIED',
+      announcement: 'We are not planning a big wedding or a grand ceremony. But you are part of our story, so we still wanted to share this happy little chapter with you.',
+      thanks: 'Thanks for playing through a small piece of our story. ♥'
+    },
+
+    audio: {
+      src: null,
+      volume: 0.16,
+      loop: true
+    },
+
+    assets: {
+      player1: { idle:null, run1:null, run2:null, jump:null },
+      player2: null,
+      collectibles: { tw:[null,null,null,null,null], de:[null,null,null,null,null], kr:[null,null,null,null,null], final:[null,null,null] },
+      backgrounds: { tw:null, de:null, kr:null, final:null },
+      openingBackground: null,
+      mapBackground: null
+    }
+  };
+
+  // State Management
+  const STORAGE_KEY='storyProgressV30';
+  const STATE_VERSION=30;
   const defaultState={version:STATE_VERSION,player:null,tw:false,de:false,kr:false};
   let savedState={};
   try{ savedState=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); }catch(e){ savedState={}; }
@@ -988,12 +700,6 @@
       if(btn) btn.textContent='Choose a Player ▶';
     }
   }
-  const chooseP1=document.getElementById('choose-p1');
-  const chooseP2=document.getElementById('choose-p2');
-  const startBtn=document.getElementById('start-btn');
-  if(chooseP1) chooseP1.addEventListener('click',()=>selectPlayer('p1'));
-  if(chooseP2) chooseP2.addEventListener('click',()=>selectPlayer('p2'));
-  // startBtn keeps its inline handler; this listener is only a keyboard/accessibility safety net.
 
   function startAdventure(){
     if(!state.player){
@@ -1008,7 +714,8 @@
   }
   function go(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const target=document.getElementById(id);
+    if(target) target.classList.add('active');
     if(id==='map') refreshMap();
     if(id==='guestbook') renderMessages();
     if(['tw','de','kr','final'].includes(id)) setTimeout(()=>startGame(id), 60);
@@ -1028,14 +735,16 @@
       const completed=id!=='final' && !!state[id];
       const visualState=completed ? 'done' : (unlocked ? 'play' : 'locked');
 
-      node.dataset.state=visualState;
+      if(node.dataset) node.dataset.state=visualState;
+      node.setAttribute('data-state', visualState);
       node.classList.toggle('locked',!unlocked);
       node.classList.toggle('done',completed);
       node.setAttribute('aria-disabled',String(!unlocked));
       node.setAttribute('aria-label',`${id.toUpperCase()} — ${visualState}`);
 
       if(badge){
-        badge.dataset.state=visualState;
+        if(badge.dataset) badge.dataset.state=visualState;
+        badge.setAttribute('data-state', visualState);
         badge.textContent=visualState==='done' ? '✓' : (visualState==='play' ? '▶' : '🔒');
       }
     });
@@ -1044,179 +753,86 @@
     const route=document.getElementById('map-route-copy');
     if(route) route.textContent=state.player ? routeLabel() : 'Choose a player to begin.';
   }
-  function saveMessage(){
-    const n=document.getElementById('guestName'), m=document.getElementById('guestMsg');
-    const name=n.value.trim(), msg=m.value.trim();
-    if(!name || !msg){ alert('Please add your name and message.'); return; }
-    const arr=JSON.parse(localStorage.getItem('guestMessages')||'[]');
-    arr.unshift({name,msg,date:new Date().toLocaleDateString()});
-    localStorage.setItem('guestMessages',JSON.stringify(arr.slice(0,20)));
-    n.value='';m.value='';renderMessages();
-  }
-  function renderMessages(){
-    const box=document.getElementById('messages');
-    const arr=JSON.parse(localStorage.getItem('guestMessages')||'[]');
-    box.innerHTML=arr.length ? arr.map(x=>`<div class="msg"><b>${escapeHtml(x.name)} <small>· ${escapeHtml(x.date)}</small></b>${escapeHtml(x.msg)}</div>`).join('') :
-      '<div class="msg"><b>No messages yet.</b>Be the first to complete this side quest ✨</div>';
-  }
-  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-
-  // --- Tiny canvas platformer engine ---
-
-  const EMBEDDED_ASSETS = {"player_idle":"assets/players/player1-idle.png","player_run1":"assets/players/player1-run1.png","player_run2":"assets/players/player1-run2.png","player_jump":"assets/players/player1-jump.png","tw_bubble_tea":"assets/collectibles/taiwan/bubble-tea.png","tw_train":"assets/collectibles/taiwan/train.png","tw_pineapple_cake":"assets/collectibles/taiwan/pineapple-cake.png","tw_dumpling":"assets/collectibles/taiwan/dumpling.png","tw_flask_green":"assets/collectibles/taiwan/flask-green.png","de_pretzel":"assets/collectibles/germany/pretzel.png","de_coffee":"assets/collectibles/germany/coffee.png","de_train":"assets/collectibles/germany/train.png","de_flask_blue":"assets/collectibles/germany/flask-blue.png","de_heart":"assets/collectibles/germany/heart.png","kr_blossom":"assets/collectibles/korea/blossom.png","kr_food":"assets/collectibles/korea/food.png","kr_airplane":"assets/collectibles/korea/airplane.png","kr_hanok":"assets/collectibles/korea/hanok.png","kr_family":"assets/collectibles/korea/family.png","flag":"assets/ui/flag.png","ring":"assets/ui/ring.png","heart":"assets/ui/heart.png","letter":"assets/ui/letter.png","guestbook":"assets/ui/letter.png","player2_idle":"assets/players/player2.png"};
-
-  const EMBEDDED_BACKGROUNDS = {"tw":"assets/backgrounds/taiwan.png","de":"assets/backgrounds/germany.png","kr":"assets/backgrounds/korea.png","final":"assets/backgrounds/final.png"};
-
-  const ASSET_PATHS = {
-    player: {
-      idle: EMBEDDED_ASSETS.player_idle,
-      run1: EMBEDDED_ASSETS.player_run1,
-      run2: EMBEDDED_ASSETS.player_run2,
-      jump: EMBEDDED_ASSETS.player_jump,
-      player2: EMBEDDED_ASSETS.player2_idle
-    },
-    tw: [
-      EMBEDDED_ASSETS.tw_bubble_tea,
-      EMBEDDED_ASSETS.tw_train,
-      EMBEDDED_ASSETS.tw_pineapple_cake,
-      EMBEDDED_ASSETS.tw_dumpling,
-      EMBEDDED_ASSETS.tw_flask_green
-    ],
-    de: [
-      EMBEDDED_ASSETS.de_pretzel,
-      EMBEDDED_ASSETS.de_coffee,
-      EMBEDDED_ASSETS.de_train,
-      EMBEDDED_ASSETS.de_flask_blue,
-      EMBEDDED_ASSETS.de_heart
-    ],
-    kr: [
-      EMBEDDED_ASSETS.kr_blossom,
-      EMBEDDED_ASSETS.kr_food,
-      EMBEDDED_ASSETS.kr_airplane,
-      EMBEDDED_ASSETS.kr_hanok,
-      EMBEDDED_ASSETS.kr_family
-    ],
-    ui: {
-      flag: EMBEDDED_ASSETS.flag,
-      ring: EMBEDDED_ASSETS.ring,
-      heart: EMBEDDED_ASSETS.heart,
-      letter: EMBEDDED_ASSETS.letter,
-      guestbook: EMBEDDED_ASSETS.guestbook
-    },
-    final: [
-      EMBEDDED_ASSETS.heart,
-      EMBEDDED_ASSETS.letter,
-      EMBEDDED_ASSETS.ring
-    ],
-    bg: {
-      tw: EMBEDDED_BACKGROUNDS.tw,
-      de: EMBEDDED_BACKGROUNDS.de,
-      kr: EMBEDDED_BACKGROUNDS.kr,
-      final: EMBEDDED_BACKGROUNDS.final
-    }
-  };
 
   // ================================================================
-  // ✏️ CUSTOMIZE HERE
-  // Edit this object first. You do NOT need to touch the game engine below.
-  // For custom image files, replace files inside ./assets/ or point to another relative path.
-  // Example: 'assets/backgrounds/taiwan.png'. Leave null to keep current art.
+  // 🔊 AUDIO & SOUND EFFECTS SYNTHESIZER (Web Audio API)
   // ================================================================
-  const CUSTOMIZE_HERE = {
-    playerNames: {
-      p1: 'Player 1',
-      p2: 'Player 2'
-    },
-
-    story: {
-      p1: {
-        tw: 'This is Player 1’s starting point: bubble tea, high-speed rail, familiar food and a little science — the first pieces of the route.',
-        de: 'Germany is where Player 1’s solo route changes: somewhere in ordinary life, Player 2 appears and the story becomes co-op.',
-        kr: 'Now the route reaches Player 2’s home base: family, food, flights and familiar places — this time visited together.',
-        twMemory: 'Home base for Player 1 — the point where this route begins before crossing continents.',
-        deMemory: 'Germany became more than a new address: this is where Player 2 appeared and solo mode quietly became co-op.',
-        krMemory: 'Player 2’s home base becomes part of a shared map — family, food, travel and memories collected together.'
-      },
-      p2: {
-        kr: 'This is Player 2’s starting point: family, food, familiar places and the first chapter of her route.',
-        de: 'Germany is where Player 2’s solo route changes: somewhere in ordinary life, Player 1 appears and the story becomes co-op.',
-        tw: 'Now the route reaches Player 1’s home base: bubble tea, high-speed rail, familiar food and a little science — this time visited together.',
-        krMemory: 'Home base for Player 2 — the point where this route begins before crossing continents.',
-        deMemory: 'Germany became more than a new address: this is where Player 1 appeared and solo mode quietly became co-op.',
-        twMemory: 'Player 1’s home base becomes part of a shared map — familiar food, trains, science and memories collected together.'
-      }
-    },
-
-    final: {
-      headlineHTML: 'WE GOT<br/>MARRIED',
-      announcement: 'We are not planning a big wedding or a grand ceremony. But you are part of our story, so we still wanted to share this happy little chapter with you.',
-      thanks: 'Thanks for playing through a small piece of our story. ♥'
-    },
-
-    // 🎵 Background music.
-    // Keep src:null to use the built-in lightweight procedural chiptune.
-    // Later you can set src:'custom-assets/our-song.mp3' to use your own file.
-    audio: {
-      src: null,
-      volume: 0.16,
-      loop: true
-    },
-
-    // Optional image overrides. Set a path to replace one item; leave null to keep it.
-    assets: {
-      player1: { idle:null, run1:null, run2:null, jump:null },
-      player2: null,
-      collectibles: {
-        tw:    [null,null,null,null,null],
-        de:    [null,null,null,null,null],
-        kr:    [null,null,null,null,null],
-        final: [null,null,null]
-      },
-      backgrounds: { tw:null, de:null, kr:null, final:null },
-      openingBackground: null,
-      mapBackground: null
-    }
-  };
-
-  function applyCustomization(){
-    const c=CUSTOMIZE_HERE;
-    const headline=document.getElementById('final-headline');
-    const announce=document.getElementById('final-announcement');
-    const thanks=document.getElementById('final-thanks');
-    if(headline) headline.innerHTML=c.final.headlineHTML;
-    if(announce) announce.textContent=c.final.announcement;
-    if(thanks) thanks.textContent=c.final.thanks;
-
-    const a=c.assets;
-    ['idle','run1','run2','jump'].forEach(pose=>{ if(a.player1[pose]) ASSET_PATHS.player[pose]=a.player1[pose]; });
-    if(a.player2) ASSET_PATHS.player.player2=a.player2;
-    ['tw','de','kr','final'].forEach(code=>{
-      const custom=a.collectibles[code]||[];
-      custom.forEach((path,i)=>{ if(path && ASSET_PATHS[code] && i<ASSET_PATHS[code].length) ASSET_PATHS[code][i]=path; });
-      if(a.backgrounds[code]) ASSET_PATHS.bg[code]=a.backgrounds[code];
-    });
-    if(a.openingBackground){
-      const hero=document.querySelector('.hero-scene');
-      if(hero) hero.style.backgroundImage=`linear-gradient(rgba(255,250,240,.08),rgba(18,29,53,.12)),url('${a.openingBackground}')`;
-    }
-    if(a.mapBackground){
-      const map=document.querySelector('.map-wrap');
-      if(map) map.style.backgroundImage=`url('${a.mapBackground}')`;
-    }
-  }
-
-  applyCustomization();
-
-  // ================================================================
-  // 🎵 MUSIC ONLY — independent of map state and platformer engine
-  // ================================================================
-  const MUSIC_MUTE_KEY='storyMusicMutedV25';
+  const MUSIC_MUTE_KEY='storyMusicMutedV30';
   let musicMuted=localStorage.getItem(MUSIC_MUTE_KEY)==='1';
   let musicStarted=false;
   let musicCtx=null;
   let musicTimer=null;
   let musicStep=0;
   const customBgm=document.getElementById('custom-bgm');
+
+  function getAudioContext(){
+    if(!musicCtx) musicCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(musicCtx.state==='suspended') musicCtx.resume();
+    return musicCtx;
+  }
+
+  function playSFX(type){
+    if(musicMuted) return;
+    try{
+      const ctx=getAudioContext();
+      if(!ctx) return;
+      const now=ctx.currentTime;
+      if(type==='jump'){
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.type='triangle';
+        osc.frequency.setValueAtTime(260,now);
+        osc.frequency.exponentialRampToValueAtTime(620,now+0.12);
+        gain.gain.setValueAtTime(0.18,now);
+        gain.gain.exponentialRampToValueAtTime(0.001,now+0.14);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now+0.15);
+      } else if(type==='doubleJump'){
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.type='sine';
+        osc.frequency.setValueAtTime(520,now);
+        osc.frequency.exponentialRampToValueAtTime(980,now+0.16);
+        gain.gain.setValueAtTime(0.22,now);
+        gain.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now+0.19);
+      } else if(type==='collect'){
+        [1046.5, 1318.5, 1567.9].forEach((freq,i)=>{
+          const osc=ctx.createOscillator();
+          const gain=ctx.createGain();
+          osc.type='square';
+          osc.frequency.setValueAtTime(freq,now+i*0.04);
+          gain.gain.setValueAtTime(0.08,now+i*0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001,now+i*0.04+0.14);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now+i*0.04); osc.stop(now+i*0.04+0.15);
+        });
+      } else if(type==='encounter'){
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq,i)=>{
+          const osc=ctx.createOscillator();
+          const gain=ctx.createGain();
+          osc.type='triangle';
+          osc.frequency.setValueAtTime(freq,now+i*0.08);
+          gain.gain.setValueAtTime(0.18,now+i*0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001,now+i*0.08+0.25);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now+i*0.08); osc.stop(now+i*0.08+0.26);
+        });
+      } else if(type==='win'){
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq,i)=>{
+          const osc=ctx.createOscillator();
+          const gain=ctx.createGain();
+          osc.type='square';
+          osc.frequency.setValueAtTime(freq,now+i*0.1);
+          gain.gain.setValueAtTime(0.12,now+i*0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001,now+i*0.1+0.35);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now+i*0.1); osc.stop(now+i*0.1+0.36);
+        });
+      }
+    }catch(e){}
+  }
 
   function refreshMusicButtons(){
     document.querySelectorAll('.music-mini').forEach(btn=>{
@@ -1225,7 +841,6 @@
       btn.classList.toggle('on',on);
       btn.classList.toggle('off',!on);
       btn.setAttribute('aria-pressed',String(on));
-      btn.title=on?'Mute background music':'Play background music';
     });
   }
 
@@ -1259,14 +874,14 @@
     const gain=musicCtx.createGain();
     osc.type='square';osc.frequency.setValueAtTime(midiFreq(note),now);
     gain.gain.setValueAtTime(0.0001,now);
-    gain.gain.exponentialRampToValueAtTime(0.12,now+0.015);
+    gain.gain.exponentialRampToValueAtTime(0.10,now+0.015);
     gain.gain.exponentialRampToValueAtTime(0.0001,now+0.22);
     osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+0.24);
 
     if(musicStep%2===0){
       const bo=musicCtx.createOscillator();const bg=musicCtx.createGain();
       bo.type='triangle';bo.frequency.setValueAtTime(midiFreq(bassNotes[Math.floor(musicStep/8)%4]),now);
-      bg.gain.setValueAtTime(0.0001,now);bg.gain.exponentialRampToValueAtTime(0.10,now+0.01);bg.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
+      bg.gain.setValueAtTime(0.0001,now);bg.gain.exponentialRampToValueAtTime(0.08,now+0.01);bg.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
       bo.connect(bg);bg.connect(master);bo.start(now);bo.stop(now+0.36);
     }
     musicStep++;
@@ -1281,8 +896,7 @@
       customBgm.volume=Math.max(0,Math.min(1,Number(cfg.volume??0.16)));
       try{await customBgm.play();musicStarted=true;}catch(e){}
     }else{
-      if(!musicCtx) musicCtx=new (window.AudioContext||window.webkitAudioContext)();
-      if(musicCtx.state==='suspended') await musicCtx.resume();
+      getAudioContext();
       if(!musicTimer){scheduleProceduralStep();musicTimer=setInterval(scheduleProceduralStep,278);}
       musicStarted=true;
     }
@@ -1304,10 +918,31 @@
   }
 
   ensureMusicButtons();
-  document.addEventListener('pointerdown',(e)=>{
-    if(e.target.closest('.music-mini')) return;
+  document.addEventListener('pointerdown',()=>{
     if(!musicMuted && !musicStarted) startMusic();
   },{once:true});
+
+  // ================================================================
+  // 🎨 ASSET LOADER
+  // ================================================================
+  const EMBEDDED_ASSETS = {"player_idle":"assets/players/player1-idle.png","player_run1":"assets/players/player1-run1.png","player_run2":"assets/players/player1-run2.png","player_jump":"assets/players/player1-jump.png","tw_bubble_tea":"assets/collectibles/taiwan/bubble-tea.png","tw_train":"assets/collectibles/taiwan/train.png","tw_pineapple_cake":"assets/collectibles/taiwan/pineapple-cake.png","tw_dumpling":"assets/collectibles/taiwan/dumpling.png","tw_flask_green":"assets/collectibles/taiwan/flask-green.png","de_pretzel":"assets/collectibles/germany/pretzel.png","de_coffee":"assets/collectibles/germany/coffee.png","de_train":"assets/collectibles/germany/train.png","de_flask_blue":"assets/collectibles/germany/flask-blue.png","de_heart":"assets/collectibles/germany/heart.png","kr_blossom":"assets/collectibles/korea/blossom.png","kr_food":"assets/collectibles/korea/food.png","kr_airplane":"assets/collectibles/korea/airplane.png","kr_hanok":"assets/collectibles/korea/hanok.png","kr_family":"assets/collectibles/korea/family.png","flag":"assets/ui/flag.png","ring":"assets/ui/ring.png","heart":"assets/ui/heart.png","letter":"assets/ui/letter.png","guestbook":"assets/ui/letter.png","player2_idle":"assets/players/player2.png"};
+  const EMBEDDED_BACKGROUNDS = {"tw":"assets/backgrounds/taiwan.png","de":"assets/backgrounds/germany.png","kr":"assets/backgrounds/korea.png","final":"assets/backgrounds/final.png"};
+
+  const ASSET_PATHS = {
+    player: {
+      idle: EMBEDDED_ASSETS.player_idle,
+      run1: EMBEDDED_ASSETS.player_run1,
+      run2: EMBEDDED_ASSETS.player_run2,
+      jump: EMBEDDED_ASSETS.player_jump,
+      player2: EMBEDDED_ASSETS.player2_idle
+    },
+    tw: [EMBEDDED_ASSETS.tw_bubble_tea, EMBEDDED_ASSETS.tw_train, EMBEDDED_ASSETS.tw_pineapple_cake, EMBEDDED_ASSETS.tw_dumpling, EMBEDDED_ASSETS.tw_flask_green],
+    de: [EMBEDDED_ASSETS.de_pretzel, EMBEDDED_ASSETS.de_coffee, EMBEDDED_ASSETS.de_train, EMBEDDED_ASSETS.de_flask_blue, EMBEDDED_ASSETS.de_heart],
+    kr: [EMBEDDED_ASSETS.kr_blossom, EMBEDDED_ASSETS.kr_food, EMBEDDED_ASSETS.kr_airplane, EMBEDDED_ASSETS.kr_hanok, EMBEDDED_ASSETS.kr_family],
+    ui: { flag: EMBEDDED_ASSETS.flag, ring: EMBEDDED_ASSETS.ring, heart: EMBEDDED_ASSETS.heart, letter: EMBEDDED_ASSETS.letter, guestbook: EMBEDDED_ASSETS.guestbook },
+    final: [EMBEDDED_ASSETS.heart, EMBEDDED_ASSETS.letter, EMBEDDED_ASSETS.ring],
+    bg: { tw: EMBEDDED_BACKGROUNDS.tw, de: EMBEDDED_BACKGROUNDS.de, kr: EMBEDDED_BACKGROUNDS.kr, final: EMBEDDED_BACKGROUNDS.final }
+  };
 
   const loadedAssets = {};
   function preloadAssets(){
@@ -1325,23 +960,30 @@
     })));
   }
   preloadAssets().then(()=>{
-    const status=document.getElementById('asset-status');
-    if(status){
-      const required=[ASSET_PATHS.player.idle, ASSET_PATHS.player.run1, ASSET_PATHS.player.jump, ...ASSET_PATHS.tw, ASSET_PATHS.ui.flag];
-      const ok=required.every(src=>loadedAssets[src]);
-      status.textContent=ok ? 'LAYERS OK' : 'SPRITE ERROR';
-      status.classList.add(ok?'ok':'bad');
-    }
-    const p1=document.getElementById('hero-player1');
-    const p2=document.getElementById('hero-player2');
-    const fp1=document.getElementById('final-player1');
-    const fp2=document.getElementById('final-player2');
+    const p1=document.getElementById('hero-player1'), p2=document.getElementById('hero-player2');
+    const fp1=document.getElementById('final-player1'), fp2=document.getElementById('final-player2');
     if(p1) p1.src=ASSET_PATHS.player.idle;
     if(p2) p2.src=ASSET_PATHS.player.player2;
     if(fp1) fp1.src=ASSET_PATHS.player.idle;
     if(fp2) fp2.src=ASSET_PATHS.player.player2;
     renderPlayerChoice();
   });
+
+  // ================================================================
+  // 🎮 2D AUTO-RUNNER & CAMERA SCROLLING ENGINE
+  // ================================================================
+  const WORLD_WIDTH = 2400;
+  const VIEW_WIDTH = 800;
+  const VIEW_HEIGHT = 450;
+
+  const levelThemes = {
+    tw: { sky:'#8fd7ff', hill:'#6ba86f', ground:'#8b5b36', landmark:'TAIWAN', collectibles:['bubble tea','train','pineapple cake','dumpling','lab flask'] },
+    de: { sky:'#9ad7ff', hill:'#70965d', ground:'#76513a', landmark:'GERMANY', collectibles:['pretzel','coffee','train','lab flask','heart'] },
+    kr: { sky:'#9fd8ff', hill:'#7daa75', ground:'#81513c', landmark:'KOREA', collectibles:['blossom','food','airplane','hanok','family'] },
+    final: { sky:'#7ab4ff', hill:'#7a95b6', ground:'#6d4c37', landmark:'FINAL QUEST', collectibles:['heart','letter','ring'] }
+  };
+
+  const games = {};
 
   function getCollectiblePaths(code){
     if(code==='tw') return ASSET_PATHS.tw;
@@ -1350,54 +992,121 @@
     return ASSET_PATHS.final;
   }
 
-  const levelThemes = {
-    // Placeholder collectibles for the MVP.
-    // Later we can replace these emoji with real uploaded PNG sprite assets without changing the game flow.
-    tw: {
-      sky:'#8fd7ff', hill:'#6ba86f', ground:'#8b5b36', landmark:'TAIWAN', emoji:'🧋  🚄  🧪',
-      collectLabel:'Taiwan story items',
-      collectibles:['bubble tea','train','pineapple cake','dumpling','lab flask']
-    },
-    de: {
-      sky:'#9ad7ff', hill:'#70965d', ground:'#76513a', landmark:'GERMANY', emoji:'🥨  🚆  ☕',
-      collectLabel:'Germany story items',
-      collectibles:['pretzel','coffee','train','lab flask','heart']
-    },
-    kr: {
-      sky:'#9fd8ff', hill:'#7daa75', ground:'#81513c', landmark:'KOREA', emoji:'🌸  ✈️  🍚',
-      collectLabel:'Korea story items',
-      collectibles:['blossom','food','airplane','hanok','family']
-    },
-    final: {
-      sky:'#7ab4ff', hill:'#7a95b6', ground:'#6d4c37', landmark:'FINAL QUEST', emoji:'💍  ✉️  ♥',
-      collectLabel:'Love items',
-      collectibles:['heart','letter','ring']
-    }
-  };
-  const games = {};
-  const pressed = {left:false,right:false};
-
   function makeLevel(code){
     const canvas=document.getElementById(code+'-game');
     if(!canvas) return null;
     const ctx=canvas.getContext('2d');
-    const groundY=372,theme=levelThemes[code],itemPaths=getCollectiblePaths(code);
-    const layouts={
-      tw:{platforms:[[0,372,800,78],[184,329,134,18],[358,286,142,18],[548,328,134,18]],coins:[[130,334],[246,280],[430,237],[612,280],[716,334]]},
-      de:{platforms:[[0,372,800,78],[170,330,138,18],[350,288,144,18],[544,329,138,18]],coins:[[128,334],[238,282],[421,239],[610,281],[716,334]]},
-      kr:{platforms:[[0,372,800,78],[180,330,136,18],[358,287,142,18],[548,329,136,18]],coins:[[130,334],[244,282],[427,239],[612,281],[716,334]]},
-      final:{platforms:[[0,372,800,78],[186,331,134,18],[366,289,144,18],[548,330,136,18]],coins:[[144,334],[432,239],[622,282]]}
+    const groundY=372, theme=levelThemes[code], itemPaths=getCollectiblePaths(code);
+
+    // Extended 2400px Level Designs with rhythmic platforming and clear visual milestones
+    const layouts = {
+      tw: {
+        platforms: [
+          [0, 372, 2400, 78], // Continuous Ground
+          [260, 310, 160, 18],
+          [480, 260, 170, 18],
+          [720, 300, 160, 18],
+          [960, 250, 180, 18],
+          [1180, 290, 170, 18],
+          [1420, 240, 180, 18],
+          [1640, 290, 170, 18],
+          [1880, 250, 190, 18],
+          [2100, 300, 160, 18]
+        ],
+        coins: [
+          [340, 260],   // 1. Bubble Tea
+          [780, 250],   // 2. High Speed Rail
+          [1260, 240],  // 3. Pineapple Cake
+          [1720, 240],  // 4. Dumpling
+          [2180, 250]   // 5. Science Lab Flask
+        ]
+      },
+      de: {
+        platforms: [
+          [0, 372, 2400, 78],
+          [280, 310, 160, 18],
+          [520, 260, 170, 18],
+          [760, 290, 160, 18],
+          [1020, 250, 180, 18],
+          [1240, 290, 170, 18],
+          [1480, 240, 180, 18],
+          [1700, 290, 170, 18],
+          [1940, 250, 190, 18],
+          [2140, 300, 160, 18]
+        ],
+        coins: [
+          [360, 260],   // 1. Pretzel
+          [820, 240],   // 2. Coffee
+          [1110, 310],  // 3. Train (Encounter Zone)
+          [1560, 190],  // 4. Blue Flask
+          [2020, 200]   // 5. Heart
+        ]
+      },
+      kr: {
+        platforms: [
+          [0, 372, 2400, 78],
+          [270, 310, 160, 18],
+          [500, 260, 170, 18],
+          [740, 300, 160, 18],
+          [980, 250, 180, 18],
+          [1200, 290, 170, 18],
+          [1440, 240, 180, 18],
+          [1660, 290, 170, 18],
+          [1900, 250, 190, 18],
+          [2120, 300, 160, 18]
+        ],
+        coins: [
+          [350, 260],   // 1. Blossom
+          [790, 250],   // 2. Korean Food
+          [1250, 240],  // 3. Airplane
+          [1710, 240],  // 4. Hanok
+          [2170, 250]   // 5. Family
+        ]
+      },
+      final: {
+        platforms: [
+          [0, 372, 2400, 78],
+          [320, 300, 180, 18],
+          [600, 250, 190, 18],
+          [900, 290, 180, 18],
+          [1200, 240, 200, 18],
+          [1500, 290, 180, 18],
+          [1800, 240, 200, 18],
+          [2080, 290, 170, 18]
+        ],
+        coins: [
+          [690, 200],   // 1. Heart
+          [1300, 190],  // 2. Love Letter
+          [1890, 190]   // 3. Marriage Ring
+        ]
+      }
     };
+
     const L=layouts[code];
     const platforms=L.platforms.map(v=>({x:v[0],y:v[1],w:v[2],h:v[3]}));
     const coins=L.coins.map((v,i)=>({x:v[0],y:v[1],r:18,taken:false,label:theme.collectibles[i],asset:itemPaths[i]}));
+
     return {
-      code,canvas,ctx,theme,platforms,coins,groundY,
-      player:{x:45,y:groundY-52,w:32,h:52,vx:0,vy:0,onGround:true,coyote:8},
-      mainPlayer:state.player||'p1',companionPlayer:companionId(),
-      finished:false,collected:0,jumpQueued:false,raf:null,last:0,frameTick:0,
-      encounteredP2:companionStartsWithLevel(code),encounterTimer:0,p2x:92,p2y:groundY-56,
-      bursts:[],trainX:-160
+      code, canvas, ctx, theme, platforms, coins, groundY,
+      worldWidth: WORLD_WIDTH,
+      cameraX: 0,
+      player: {
+        x: 60, y: groundY-52, w: 32, h: 52,
+        vx: 4.2, vy: 0,
+        onGround: true, coyote: 8, jumpBuffer: 0,
+        canDoubleJump: true, isHoldingJump: false
+      },
+      mainPlayer: state.player||'p1',
+      companionPlayer: companionId(),
+      finished: false,
+      collected: 0,
+      raf: null, last: 0, frameTick: 0,
+      encounteredP2: companionStartsWithLevel(code),
+      encounterTimer: 0,
+      p2x: 20, p2y: groundY-56,
+      bursts: [],
+      particles: [],
+      trainX: -220
     };
   }
 
@@ -1405,134 +1114,190 @@
     if(games[code] && games[code].raf) cancelAnimationFrame(games[code].raf);
     games[code]=makeLevel(code);
     const g=games[code]; if(!g) return;
-    document.getElementById(code+'-finish').classList.remove('show');
-    const mem=document.getElementById(code+'-memory'); if(mem) mem.classList.remove('show');
-    const rev=document.getElementById(code+'-reveal'); if(rev) rev.classList.remove('show');
-    document.getElementById(code+'-coin-count').textContent='0';
-    document.getElementById(code+'-status').textContent=(code==='final' ? 'Collect 2+ love items →' : 'Collect 4+ story items →');
+
+    // Reset UI
+    const finishPanel=document.getElementById(code+'-finish'); if(finishPanel) finishPanel.classList.remove('show');
+    const memoryCard=document.getElementById(code+'-memory'); if(memoryCard) memoryCard.classList.remove('show');
+    const revealCard=document.getElementById(code+'-reveal'); if(revealCard) revealCard.classList.remove('show');
+    const coinCount=document.getElementById(code+'-coin-count'); if(coinCount) coinCount.textContent='0';
+    const status=document.getElementById(code+'-status');
+    if(status) status.textContent=(code==='final' ? 'Collect love items →' : 'Run & Collect →');
+    const progressFill=document.getElementById(code+'-progress-fill');
+    if(progressFill) progressFill.style.width='0%';
+
     const modeBadge=document.getElementById(code+'-mode-badge');
     if(modeBadge) modeBadge.textContent=g.encounteredP2 ? 'CO-OP MODE' : 'SOLO START';
 
-    const twStory=document.getElementById('tw-story-copy');
-    const deStory=document.getElementById('de-story-copy');
-    const krStory=document.getElementById('kr-story-copy');
-    const twMem=document.getElementById('tw-memory-copy');
-    const deMem=document.getElementById('de-memory-copy');
-    const krMem=document.getElementById('kr-memory-copy');
+    // Populate story texts
     const story=CUSTOMIZE_HERE.story[state.player];
     if(story){
-      if(twStory && story.tw) twStory.textContent=story.tw;
-      if(deStory && story.de) deStory.textContent=story.de;
-      if(krStory && story.kr) krStory.textContent=story.kr;
-      if(twMem && story.twMemory) twMem.textContent=story.twMemory;
-      if(deMem && story.deMemory) deMem.textContent=story.deMemory;
-      if(krMem && story.krMemory) krMem.textContent=story.krMemory;
+      const elStory=document.getElementById(code+'-story-copy');
+      const elMem=document.getElementById(code+'-memory-copy');
+      if(elStory && story[code]) elStory.textContent=story[code];
+      if(elMem && story[code+'Memory']) elMem.textContent=story[code+'Memory'];
     }
+
     g.last=performance.now();
     g.raf=requestAnimationFrame((t)=>loopGame(g,t));
   }
 
   function leaveGame(code){
     if(games[code] && games[code].raf) cancelAnimationFrame(games[code].raf);
-    pressed.left=false; pressed.right=false;
     go('map');
   }
 
   function loopGame(g,t){
     const dt=Math.min((t-g.last)/16.666,2); g.last=t;
-    updateGame(g,dt); drawGame(g);
+    updateGame(g,dt);
+    drawGame(g);
     if(!g.finished && document.getElementById(g.code).classList.contains('active')){
       g.raf=requestAnimationFrame((nt)=>loopGame(g,nt));
     }
   }
 
+  // --- Physics & Game Loop ---
   function updateGame(g,dt){
-    const p=g.player, speed=4.38;
-    if(pressed.left) p.vx=-speed;
-    else if(pressed.right) p.vx=speed;
-    else p.vx*=0.72;
+    const p=g.player;
+    const runSpeed=4.2;
 
-    if(p.onGround) p.coyote=7;
-    else p.coyote=Math.max(0,p.coyote-dt);
+    // Auto-runner: continuous forward momentum
+    p.vx = runSpeed;
 
-    if(g.jumpQueued && (p.onGround || p.coyote>0)){
-      p.vy=-11.3;
-      p.onGround=false;
-      p.coyote=0;
+    // Jump Buffering & Coyote Time
+    if(p.onGround){
+      p.coyote = 8;
+      p.canDoubleJump = true;
+    } else {
+      p.coyote = Math.max(0, p.coyote - dt);
     }
-    g.jumpQueued=false;
-    p.vy += 0.54*dt;
+    if(p.jumpBuffer > 0) p.jumpBuffer -= dt;
 
-    const oldY=p.y;
-    p.x += p.vx*dt;
-    p.y += p.vy*dt;
-    p.x=Math.max(0,Math.min(770,p.x));
-
-    p.onGround=false;
-    for(const pl of g.platforms){
-      const wasAbove = oldY+p.h <= pl.y+10;
-      const nowCross = p.y+p.h >= pl.y && p.y+p.h <= pl.y+32;
-      const overlapX = p.x+p.w>pl.x && p.x<pl.x+pl.w;
-      if(p.vy>=0 && wasAbove && nowCross && overlapX){
-        p.y=pl.y-p.h; p.vy=0; p.onGround=true;
+    // Process Jump
+    if(p.jumpBuffer > 0){
+      if(p.onGround || p.coyote > 0){
+        p.vy = -11.6;
+        p.onGround = false;
+        p.coyote = 0;
+        p.jumpBuffer = 0;
+        playSFX('jump');
+        g.bursts.push({x:p.x+p.w/2, y:p.y+p.h, life:14, label:'✦'});
+      } else if(p.canDoubleJump){
+        p.vy = -10.8;
+        p.canDoubleJump = false;
+        p.jumpBuffer = 0;
+        playSFX('doubleJump');
+        g.bursts.push({x:p.x+p.w/2, y:p.y+p.h, life:18, label:'✨'});
       }
     }
-    if(p.y>460){ p.x=45;p.y=g.groundY-48;p.vx=0;p.vy=0; }
 
+    // Gravity
+    p.vy += 0.54 * dt;
+    const oldY = p.y;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
 
-    // Germany story event: Player 2 appears halfway through the level.
-    if(g.code==='de' && !g.encounteredP2 && p.x>390){
-      g.encounteredP2=true;
-      g.encounterTimer=150; // ~2.5 seconds at 60 fps
-      const status=document.getElementById(g.code+'-status');
-      if(status) status.textContent=`A wild ${g.companionPlayer==='p2'?'Player 2':'Player 1'} appeared! ♥`;
+    // Platform Collisions (One-way top landing)
+    p.onGround = false;
+    for(const pl of g.platforms){
+      const wasAbove = oldY + p.h <= pl.y + 12;
+      const nowCross = p.y + p.h >= pl.y && p.y + p.h <= pl.y + 36;
+      const overlapX = p.x + p.w > pl.x && p.x < pl.x + pl.w;
+      if(p.vy >= 0 && wasAbove && nowCross && overlapX){
+        p.y = pl.y - p.h;
+        p.vy = 0;
+        p.onGround = true;
+      }
     }
-    if(g.encounterTimer>0) g.encounterTimer-=dt;
 
+    // Safe Pit / Fall Recovery (keeps runner forgiving and fun)
+    if(p.y > 450){
+      p.y = g.groundY - 52;
+      p.vy = -6;
+      g.bursts.push({x:p.x+p.w/2, y:p.y+p.h, life:20, label:'♥'});
+    }
+
+    // Camera Tracking (Smooth follow with forward visibility)
+    const targetCameraX = Math.max(0, Math.min(g.worldWidth - VIEW_WIDTH, p.x - 220));
+    g.cameraX += (targetCameraX - g.cameraX) * 0.12 * dt;
+
+    // Update Progress Bar
+    const progressPct = Math.min(100, Math.max(0, (p.x / 2280) * 100));
+    const fillEl = document.getElementById(g.code+'-progress-fill');
+    if(fillEl) fillEl.style.width = progressPct.toFixed(1) + '%';
+
+    // Germany Story Event: Player 2 joins midway (~1100px)
+    if(g.code==='de' && !g.encounteredP2 && p.x > 1060){
+      g.encounteredP2 = true;
+      g.encounterTimer = 180;
+      g.p2x = p.x - 140;
+      g.p2y = p.y - 40;
+      playSFX('encounter');
+      for(let i=0; i<8; i++){
+        g.bursts.push({x:p.x+Math.random()*60-30, y:p.y+Math.random()*40-20, life:28, label:'♥'});
+      }
+      const status=document.getElementById(g.code+'-status');
+      if(status) status.textContent=`♥ A wild ${g.companionPlayer==='p2'?'Mira':'Eric'} appeared!`;
+    }
+    if(g.encounterTimer > 0) g.encounterTimer -= dt;
+
+    // Item Collection
     for(const c of g.coins){
       if(!c.taken){
-        const px=p.x+p.w/2, py=p.y+p.h/2;
-        const dx=Math.abs(px-c.x), dy=Math.abs(py-c.y);
-        // Intentionally forgiving for an invitation game:
-        // the visible sprite can be larger than its logical center.
-        if(dx<48 && dy<58){
-          c.taken=true; g.collected++;
-          g.bursts.push({x:c.x,y:c.y,life:22,label:'✦'});
-          document.getElementById(g.code+'-coin-count').textContent=g.collected;
-          if(g.code==='final'){
-            document.getElementById(g.code+'-status').textContent =
-              g.collected>=2 ? (g.collected===3 ? 'Perfect! Reach the ring gate →' : 'Reach the ring gate →') : 'Nice! Keep going →';
-          } else {
-            document.getElementById(g.code+'-status').textContent=
-              g.collected>=4 ? (g.collected===5 ? 'Perfect! Head to the flag →' : 'Enough memories! Head to the flag →') : 'Nice! Keep going →';
+        const px = p.x + p.w/2, py = p.y + p.h/2;
+        const dx = Math.abs(px - c.x), dy = Math.abs(py - c.y);
+        if(dx < 54 && dy < 64){
+          c.taken = true;
+          g.collected++;
+          playSFX('collect');
+          g.bursts.push({x:c.x, y:c.y, life:24, label:'✦'});
+          const cnt=document.getElementById(g.code+'-coin-count');
+          if(cnt) cnt.textContent = g.collected;
+          const status=document.getElementById(g.code+'-status');
+          if(status){
+            status.textContent = (g.code==='final')
+              ? `♥ ${g.collected}/3 love items collected!`
+              : `🎒 ${g.collected}/5 story memories collected!`;
           }
         }
       }
     }
-    // True co-op visual: companion follows after the Germany encounter,
-    // and is present from the start of Korea.
+
+    // Co-op Companion Tracking
     if(g.encounteredP2){
-      const targetX=Math.max(18,p.x-52);
-      const targetY=p.y+p.h-58;
-      g.p2x += (targetX-g.p2x)*0.12*dt;
-      g.p2y += (targetY-g.p2y)*0.16*dt;
+      const targetP2X = Math.max(20, p.x - 52);
+      const targetP2Y = p.y;
+      g.p2x += (targetP2X - g.p2x) * 0.14 * dt;
+      g.p2y += (targetP2Y - g.p2y) * 0.18 * dt;
+
+      // Occasional romance heart between couple
+      if(Math.random() < 0.03 * dt){
+        g.bursts.push({x:(p.x+g.p2x)/2+16, y:Math.min(p.y,g.p2y)-10, life:22, label:'♥'});
+      }
     }
 
+    // Stage Goal Detection (Flag at x = 2280)
     if(g.code==='final'){
-      if(p.x>682 && g.collected>=2) finishGame(g.code,false);
+      if(p.x > 2260 && !g.finished){
+        playSFX('win');
+        finishGame(g.code, false);
+      }
     } else {
-      if(p.x>742 && g.collected>=4) finishGame(g.code,false);
+      if(p.x > 2280 && !g.finished){
+        playSFX('win');
+        finishGame(g.code, false);
+      }
     }
   }
 
-  // V29 visual-only platform renderer. Collision rectangles are unchanged.
+  // --- Rendering with Parallax ---
   const PLATFORM_ART = {
     tw:{grass:'#79d85e',grassHi:'#b9f38e',grassDark:'#46963b',dirt:'#8b5b38',dirtDark:'#634029',dirtHi:'#b97b4e'},
     de:{grass:'#82cc61',grassHi:'#c2ed98',grassDark:'#4e9140',dirt:'#8d6040',dirtDark:'#64422c',dirtHi:'#b7835a'},
     kr:{grass:'#76cf83',grassHi:'#b5efbb',grassDark:'#438c59',dirt:'#8c5e42',dirtDark:'#63412f',dirtHi:'#b27d59'},
     final:{grass:'#e69ab8',grassHi:'#ffd0df',grassDark:'#a85f80',dirt:'#7d5668',dirtDark:'#593b4a',dirtHi:'#aa7c90'}
   };
-  function drawPixelPlatform(ctx,pl,code,isGround){
+
+  function drawPixelPlatform(ctx, pl, code, isGround){
     const p=PLATFORM_ART[code]||PLATFORM_ART.tw; const gh=isGround?10:8; const by=pl.y+gh; const bh=Math.max(2,pl.h-gh);
     ctx.save();ctx.imageSmoothingEnabled=false;
     if(!isGround){ctx.fillStyle='rgba(10,20,35,.18)';ctx.fillRect(pl.x+8,pl.y+pl.h+4,Math.max(8,pl.w-16),5);}
@@ -1545,387 +1310,352 @@
   }
 
   function drawGame(g){
-    const ctx=g.ctx, p=g.player, th=g.theme;
-    ctx.clearRect(0,0,800,450);
-    ctx.fillStyle=th.sky;ctx.fillRect(0,0,800,450);
+    const ctx=g.ctx, p=g.player, camX=g.cameraX;
+    ctx.clearRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
 
-    ctx.fillStyle='rgba(255,255,255,.9)';
-    [[80,70],[310,105],[570,62]].forEach(([x,y])=>{
-      ctx.fillRect(x,y,65,18);ctx.fillRect(x+15,y-16,36,16);
-    });
-
-    const bgKey = ASSET_PATHS.bg && ASSET_PATHS.bg[g.code];
-    const bg = bgKey ? loadedAssets[bgKey] : null;
-    if(bg){
-      ctx.drawImage(bg, 0, 0, 800, 450);
-      ctx.save();
-      if(g.code==='tw') ctx.fillStyle='rgba(120,190,255,.16)';
-      else if(g.code==='de') ctx.fillStyle='rgba(150,180,220,.18)';
-      else if(g.code==='kr') ctx.fillStyle='rgba(255,210,235,.12)';
-      else ctx.fillStyle='rgba(70,60,120,.07)';
-      ctx.fillRect(0,0,800,450);
-      ctx.restore();
-      if(g.code==='tw'){
-        g.trainX += 0.9; if(g.trainX>870) g.trainX=-200;
-        ctx.save();
-        ctx.globalAlpha = 0.96;
-        ctx.fillStyle='#eff7fb';ctx.fillRect(g.trainX,302,140,14);ctx.fillRect(g.trainX+10,298,116,9);
-        ctx.fillStyle='#f38a3f';ctx.fillRect(g.trainX+10,312,118,3);
-        ctx.fillStyle='#2b4263';for(let i=0;i<4;i++) ctx.fillRect(g.trainX+22+i*22,304,15,5);
-        ctx.beginPath();ctx.moveTo(g.trainX+140,302);ctx.lineTo(g.trainX+159,309);ctx.lineTo(g.trainX+140,316);ctx.closePath();ctx.fillStyle='#eff7fb';ctx.fill();
-        ctx.restore();
-      }
-    } else {
-
-    if(g.code==='tw'){
-      ctx.fillStyle='#8fd7ff';ctx.fillRect(0,0,800,450);
-      ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(0,70,800,18);ctx.fillRect(0,120,800,12);
-      ctx.fillStyle='#7fa9b8';
-      ctx.beginPath();ctx.moveTo(0,300);ctx.lineTo(105,230);ctx.lineTo(215,300);ctx.lineTo(340,220);ctx.lineTo(468,300);ctx.lineTo(618,235);ctx.lineTo(800,300);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#6fa26f';
-      ctx.beginPath();ctx.moveTo(0,320);ctx.lineTo(115,205);ctx.lineTo(235,320);ctx.lineTo(365,220);ctx.lineTo(510,320);ctx.lineTo(650,225);ctx.lineTo(800,320);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='rgba(48,93,132,.38)';
-      [[20,248,28,62],[58,236,36,74],[104,258,26,52],[136,230,40,80],[678,246,42,64],[730,224,46,86]].forEach(b=>ctx.fillRect(...b));
-      ctx.fillStyle='#33656e';
-      const tx=88, by=304;
-      for(let i=0;i<7;i++) ctx.fillRect(tx-i*2,by-35-i*20,30+i*4,17);
-      ctx.fillRect(tx+10,by-187,10,18);ctx.fillRect(tx+14,by-208,3,22);
-      ctx.fillStyle='#818c95';ctx.fillRect(0,336,800,8);
-      ctx.fillStyle='#646f76';for(let vx=40;vx<800;vx+=95)ctx.fillRect(vx,344,8,28);
-      g.trainX += 0.8; if(g.trainX>860) g.trainX=-180;
-      ctx.fillStyle='#eef5f8';ctx.fillRect(g.trainX,316,155,16);ctx.fillRect(g.trainX+12,312,128,10);
-      ctx.fillStyle='#f3823c';ctx.fillRect(g.trainX+10,327,132,4);
-      ctx.fillStyle='#25344a';for(let i=0;i<5;i++)ctx.fillRect(g.trainX+25+i*20,318,13,6);
-      ctx.beginPath();ctx.moveTo(g.trainX+155,316);ctx.lineTo(g.trainX+176,324);ctx.lineTo(g.trainX+155,332);ctx.closePath();ctx.fillStyle='#eef5f8';ctx.fill();
-
-    } else if(g.code==='de'){
-      ctx.fillStyle='#91c8f2';ctx.fillRect(0,0,800,450);
-      ctx.fillStyle='#99a8bd';
-      ctx.beginPath();ctx.moveTo(0,292);ctx.lineTo(120,230);ctx.lineTo(210,292);ctx.lineTo(350,210);ctx.lineTo(505,292);ctx.lineTo(655,222);ctx.lineTo(800,292);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#4d8bc0';ctx.fillRect(0,334,800,44);
-      ctx.fillStyle='rgba(255,255,255,.14)';for(let rx=20;rx<800;rx+=70) ctx.fillRect(rx,346,36,3);
-      const houses=[[26,273,64,47],[90,255,74,65],[160,267,58,53],[590,268,70,52],[665,252,82,68]];
-      houses.forEach((h,i)=>{
-        ctx.fillStyle=i%2?'#d8b48a':'#c9936b';ctx.fillRect(h[0],h[1],h[2],h[3]);
-        ctx.fillStyle='#7a3d32';ctx.beginPath();ctx.moveTo(h[0]-4,h[1]);ctx.lineTo(h[0]+h[2]/2,h[1]-28);ctx.lineTo(h[0]+h[2]+4,h[1]);ctx.closePath();ctx.fill();
-        ctx.strokeStyle='#5a4337';ctx.lineWidth=3;ctx.strokeRect(h[0],h[1],h[2],h[3]);
-        ctx.beginPath();ctx.moveTo(h[0]+h[2]/2,h[1]);ctx.lineTo(h[0]+h[2]/2,h[1]+h[3]);ctx.stroke();
-        ctx.fillStyle='#edf3ef';ctx.fillRect(h[0]+10,h[1]+12,10,10);ctx.fillRect(h[0]+h[2]-22,h[1]+12,10,10);
-      });
-      ctx.fillStyle='#4e5968';
-      ctx.fillRect(198,188,84,128);
-      ctx.beginPath();ctx.moveTo(198,188);ctx.lineTo(217,128);ctx.lineTo(234,188);ctx.fill();
-      ctx.beginPath();ctx.moveTo(245,188);ctx.lineTo(262,120);ctx.lineTo(282,188);ctx.fill();
-      ctx.fillRect(220,218,40,98);
-      ctx.fillStyle='#8b8172';ctx.fillRect(260,314,318,18);
-      ctx.strokeStyle='#5d564d';ctx.lineWidth=3;ctx.strokeRect(260,314,318,18);
-      for(let bx=286;bx<562;bx+=54){ctx.beginPath();ctx.arc(bx,334,18,Math.PI,0);ctx.stroke();}
-      ctx.fillStyle='#5c6c7d';ctx.fillRect(684,185,10,128);
-      ctx.beginPath();ctx.arc(689,173,18,0,Math.PI*2);ctx.fill();
-      ctx.fillRect(687,146,4,20);
-      [[58,236],[752,244]].forEach(([x,y])=>{
-        ctx.fillStyle='#6b4a2d';ctx.fillRect(x,y,8,72);
-        ctx.fillStyle='#d77e32';ctx.beginPath();ctx.arc(x+4,y,33,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#e0a63a';ctx.beginPath();ctx.arc(x-16,y+11,22,0,Math.PI*2);ctx.fill();
-      });
-      ctx.fillStyle='#26354a';ctx.fillRect(12,224,5,84);ctx.beginPath();ctx.arc(14,214,12,0,Math.PI*2);ctx.fill();
-
-    } else if(g.code==='kr'){
-      ctx.fillStyle='#9fd8ff';ctx.fillRect(0,0,800,450);
-      ctx.fillStyle='#9aafc1';
-      ctx.beginPath();ctx.moveTo(0,305);ctx.lineTo(155,245);ctx.lineTo(286,305);ctx.lineTo(418,230);ctx.lineTo(575,305);ctx.lineTo(700,248);ctx.lineTo(800,305);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#89a883';
-      ctx.beginPath();ctx.moveTo(0,320);ctx.lineTo(150,235);ctx.lineTo(280,320);ctx.lineTo(420,225);ctx.lineTo(575,320);ctx.lineTo(700,245);ctx.lineTo(800,320);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#526a78';ctx.fillRect(110,190,14,116);
-      ctx.fillRect(98,218,38,10);ctx.beginPath();ctx.arc(117,208,16,0,Math.PI*2);ctx.fill();
-      ctx.fillRect(114,162,6,28);
-      ctx.fillStyle='#8b5b3f';ctx.fillRect(510,270,118,46);ctx.fillRect(440,286,65,30);
-      ctx.fillStyle='#26354a';
-      ctx.beginPath();ctx.moveTo(492,270);ctx.lineTo(570,236);ctx.lineTo(648,270);ctx.closePath();ctx.fill();
-      ctx.beginPath();ctx.moveTo(432,286);ctx.lineTo(473,263);ctx.lineTo(515,286);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#d4b07c';ctx.fillRect(538,280,18,36);ctx.fillRect(590,280,18,36);ctx.fillRect(460,292,14,24);
-      [[60,252],[710,255]].forEach(([x,y])=>{
-        ctx.fillStyle='#6e4f45';ctx.fillRect(x,y,7,61);
-        ['#f3a0b8','#f5bfd0','#e981a3'].forEach((col,j)=>{
-          ctx.fillStyle=col;ctx.beginPath();ctx.arc(x-17+j*18,y-8+(j%2)*8,22,0,Math.PI*2);ctx.fill();
-        });
-      });
-
-    } else if(g.code==='final'){
-      const grad = ctx.createLinearGradient(0,0,0,450);
-      grad.addColorStop(0,'#7f8dff');
-      grad.addColorStop(.58,'#394a85');
-      grad.addColorStop(1,'#1a2444');
-      ctx.fillStyle=grad;ctx.fillRect(0,0,800,450);
-      ctx.fillStyle='rgba(255,255,255,.85)';
-      [[70,58],[140,92],[225,52],[302,112],[368,73],[468,54],[520,104],[620,68],[705,92],[760,48]].forEach(([x,y])=>ctx.fillRect(x,y,4,4));
-      ctx.fillStyle='#ffd166';
-      [[108,128],[196,84],[286,142],[566,132],[688,124]].forEach(([x,y])=>{ctx.fillRect(x,y,3,11);ctx.fillRect(x-4,y+4,11,3);});
-      ctx.fillStyle='rgba(15,25,48,.45)';
-      [[25,275,34,75],[70,248,32,102],[114,265,22,85],[154,232,38,118],[655,262,34,88],[706,246,28,104],[744,224,36,126]].forEach(b=>ctx.fillRect(...b));
-      ctx.fillStyle='rgba(15,25,48,.7)';
-      ctx.fillRect(116,182,14,92);ctx.beginPath();ctx.arc(123,175,15,0,Math.PI*2);ctx.fill();
-      ctx.fillRect(178,184,18,90);ctx.fillRect(174,166,26,18);ctx.fillRect(172,146,30,20);
-      ctx.fillRect(602,190,12,82);ctx.beginPath();ctx.arc(608,178,16,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='#536a6b';
-      ctx.beginPath();ctx.moveTo(0,334);ctx.lineTo(150,260);ctx.lineTo(300,334);ctx.lineTo(450,252);ctx.lineTo(610,334);ctx.lineTo(760,268);ctx.lineTo(800,334);ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#8e6f55';ctx.fillRect(702,240,8,112);ctx.fillRect(738,240,8,112);
-      ctx.beginPath();ctx.arc(724,240,24,Math.PI,0);ctx.strokeStyle='#8e6f55';ctx.lineWidth=8;ctx.stroke();
-      ctx.fillStyle='#f19bb6';
-      [[698,242],[710,226],[724,218],[738,226],[748,242],[716,250],[732,250]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();});
-
-    } else {
-      ctx.fillStyle=th.hill;
-      ctx.beginPath();ctx.moveTo(0,310);ctx.lineTo(120,190);ctx.lineTo(235,310);
-      ctx.lineTo(360,205);ctx.lineTo(505,310);ctx.lineTo(650,220);ctx.lineTo(800,310);
-      ctx.lineTo(800,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-    }
-
-    }
-
-    // Small ambient particles keep each country alive without changing gameplay.
-    const now=performance.now()/1000;
+    // ================= LAYER 0: SKY & PARALLAX FAR LAYER (0.15x) =================
     ctx.save();
-    if(g.code==='de'){
-      ['#e39a38','#c86d34','#f0b24a'].forEach((col,j)=>{
-        ctx.fillStyle=col;
-        for(let i=0;i<4;i++){
-          const x=(i*197 + j*71 + now*(13+j*3))%830-15;
-          const y=120+((i*67+j*31+now*18)%205);
-          ctx.fillRect(x,y,4+j,3+j);
-        }
-      });
-    } else if(g.code==='kr'){
-      ctx.fillStyle='rgba(255,188,211,.88)';
-      for(let i=0;i<10;i++){
-        const x=(i*83 + now*18)%850-20;
-        const y=95+((i*47+now*14)%230);
-        ctx.fillRect(x,y,4,3);
+    if(g.code==='final'){
+      const grad = ctx.createLinearGradient(0,0,0,VIEW_HEIGHT);
+      grad.addColorStop(0,'#4a3f7a'); grad.addColorStop(.6,'#1a2444'); grad.addColorStop(1,'#0c1022');
+      ctx.fillStyle=grad; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
+    } else {
+      ctx.fillStyle=g.theme.sky; ctx.fillRect(0,0,VIEW_WIDTH,VIEW_HEIGHT);
+    }
+
+    // Clouds / Stars Parallax
+    const farParallax = camX * 0.15;
+    if(g.code==='final'){
+      ctx.fillStyle='rgba(255,255,255,.9)';
+      for(let i=0; i<30; i++){
+        const sx = ((i*97 - farParallax) % 850 + 850) % 850;
+        const sy = (i*37) % 220 + 20;
+        ctx.fillRect(sx, sy, 3, 3);
       }
-    } else if(g.code==='final'){
-      ctx.fillStyle='rgba(255,220,120,.92)';
-      for(let i=0;i<9;i++){
-        const x=55+i*87;
-        const y=58+Math.sin(now*2+i)*18+(i%3)*35;
-        ctx.fillRect(x,y,3,3);
+    } else {
+      ctx.fillStyle='rgba(255,255,255,.85)';
+      for(let i=0; i<8; i++){
+        const cx = ((i*260 - farParallax) % 950 + 950) % 950 - 80;
+        const cy = 40 + (i%3)*30;
+        ctx.fillRect(cx, cy, 75, 20);
+        ctx.fillRect(cx+16, cy-14, 42, 16);
       }
     }
     ctx.restore();
 
-    ctx.fillStyle='rgba(255,255,255,.86)';
-    ctx.fillRect(22,20,190,48);ctx.strokeStyle='#18213a';ctx.lineWidth=4;ctx.strokeRect(22,20,190,48);
-    ctx.fillStyle='#18213a';ctx.font='bold 20px Courier New';ctx.fillText(th.landmark,38,50);
-    // v28: legacy decorative item preview removed; playable collectibles below are the single source of truth.
+    // ================= LAYER 1: MIDGROUND PARALLAX (0.45x) =================
+    const midParallax = camX * 0.45;
+    ctx.save();
+    if(g.code==='tw'){
+      // Mountain Ridges
+      ctx.fillStyle='#6fa26f';
+      ctx.beginPath();
+      for(let x=0; x<=VIEW_WIDTH+100; x+=80){
+        const worldX = x + midParallax;
+        const my = 260 + Math.sin(worldX*0.006)*45;
+        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
+      }
+      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
 
+      // Moving High-Speed Bullet Train
+      g.trainX += 1.6; if(g.trainX > g.worldWidth + 200) g.trainX = -220;
+      const trainScreenX = g.trainX - camX;
+      if(trainScreenX > -250 && trainScreenX < VIEW_WIDTH + 100){
+        ctx.save();
+        ctx.fillStyle='#eff7fb'; ctx.fillRect(trainScreenX, 316, 150, 16); ctx.fillRect(trainScreenX+10, 312, 126, 10);
+        ctx.fillStyle='#f38a3f'; ctx.fillRect(trainScreenX+10, 327, 128, 4);
+        ctx.fillStyle='#2b4263'; for(let i=0; i<5; i++) ctx.fillRect(trainScreenX+22+i*22, 318, 14, 6);
+        ctx.beginPath(); ctx.moveTo(trainScreenX+150,316); ctx.lineTo(trainScreenX+172,324); ctx.lineTo(trainScreenX+150,332); ctx.closePath(); ctx.fillStyle='#eff7fb'; ctx.fill();
+        ctx.restore();
+      }
+    } else if(g.code==='de'){
+      // Rhine River & European House Silhouettes
+      ctx.fillStyle='#7e9db8';
+      ctx.beginPath();
+      for(let x=0; x<=VIEW_WIDTH+100; x+=90){
+        const worldX = x + midParallax;
+        const my = 270 + Math.sin(worldX*0.007)*35;
+        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
+      }
+      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
+      // Timber Houses
+      for(let i=0; i<12; i++){
+        const hx = ((i*240 - midParallax) % 1000 + 1000) % 1000 - 60;
+        ctx.fillStyle='#c9936b'; ctx.fillRect(hx, 275, 55, 45);
+        ctx.fillStyle='#7a3d32'; ctx.beginPath(); ctx.moveTo(hx-4, 275); ctx.lineTo(hx+27, 245); ctx.lineTo(hx+59, 275); ctx.closePath(); ctx.fill();
+      }
+    } else if(g.code==='kr'){
+      // Seoul Mountain Skyline & Hanok Silhouettes
+      ctx.fillStyle='#8ca885';
+      ctx.beginPath();
+      for(let x=0; x<=VIEW_WIDTH+100; x+=80){
+        const worldX = x + midParallax;
+        const my = 270 + Math.sin(worldX*0.006)*40;
+        if(x===0) ctx.moveTo(x, my); else ctx.lineTo(x, my);
+      }
+      ctx.lineTo(VIEW_WIDTH, 390); ctx.lineTo(0, 390); ctx.closePath(); ctx.fill();
+      // Floating Cherry Blossom Petals
+      const now = performance.now() / 1000;
+      ctx.fillStyle='rgba(255,188,211,.88)';
+      for(let i=0; i<14; i++){
+        const px = ((i*85 + now*24 - midParallax*0.5) % (VIEW_WIDTH+60) + (VIEW_WIDTH+60)) % (VIEW_WIDTH+60) - 30;
+        const py = 70 + ((i*43 + now*16) % 260);
+        ctx.fillRect(px, py, 5, 4);
+      }
+    } else if(g.code==='final'){
+      // Romantic Star Galaxy Particles
+      const now = performance.now() / 1000;
+      ctx.fillStyle='rgba(255,225,140,.92)';
+      for(let i=0; i<12; i++){
+        const sx = ((i*80 - midParallax*0.6) % VIEW_WIDTH + VIEW_WIDTH) % VIEW_WIDTH;
+        const sy = 60 + Math.sin(now*2+i)*18 + (i%3)*40;
+        ctx.fillRect(sx, sy, 4, 4);
+      }
+    }
+    ctx.restore();
+
+    // ================= LAYER 2: WORLD SPACE (1.0x - Camera Translated) =================
+    ctx.save();
+    ctx.translate(-Math.round(camX), 0);
+
+    // Render Platforms
     g.platforms.forEach(pl=>{
       const isGround = pl.y >= g.groundY;
-      drawPixelPlatform(ctx,pl,g.code,isGround);
+      drawPixelPlatform(ctx, pl, g.code, isGround);
     });
 
+    // Render Collectible Items
     g.coins.forEach(c=>{
       if(!c.taken){
-const img = loadedAssets[c.asset];
+        const img = loadedAssets[c.asset];
         if(img){
-          const targetH = 36;
+          const targetH = 38;
           const ratio = img.width / img.height;
           const dh = targetH;
-          const dw = Math.min(62, targetH * ratio);
-          ctx.drawImage(img, c.x - dw/2, c.y - dh/2, dw, dh);
+          const dw = Math.min(64, targetH * ratio);
+          // Subtle floating bobbing
+          const bob = Math.sin((performance.now()/250) + c.x)*4;
+          ctx.drawImage(img, c.x - dw/2, c.y - dh/2 + bob, dw, dh);
         } else {
-          ctx.fillStyle='#ff3355';
-          ctx.fillRect(c.x-15,c.y-15,30,30);
-          ctx.fillStyle='#fff';
-          ctx.font='bold 14px Courier New';
-          ctx.fillText('ERR',c.x-13,c.y+5);
+          ctx.fillStyle='#ff3355'; ctx.fillRect(c.x-16, c.y-16, 32, 32);
         }
       }
     });
-    ctx.textAlign='left';
-    ctx.textBaseline='alphabetic';
 
-
-    // tiny pickup sparkle animation
-    g.bursts = g.bursts.filter(b=>b.life>0);
-    g.bursts.forEach(b=>{
-      const alpha=Math.max(0,b.life/22);
-      ctx.save();
-      ctx.globalAlpha=alpha;
-      ctx.fillStyle='#ffd166';
-      ctx.font='bold 28px serif';
-      ctx.fillText(b.label,b.x-8,b.y-(22-b.life)*1.4);
-      ctx.restore();
-      b.life--;
-    });
-
-
-    // Co-op companion renderer.
-    if(g.encounteredP2){
-      const companionAsset=g.companionPlayer==='p2' ? ASSET_PATHS.player.player2 : ASSET_PATHS.player.idle;
-      const p2=loadedAssets[companionAsset];
-      if(p2){
-        const ph=52, pw=ph*(p2.width/p2.height);
-        ctx.drawImage(p2,g.p2x,g.p2y,pw,ph);
-      }
-
-      if(g.code==='de' && g.encounterTimer>0){
-        ctx.save();
-        ctx.fillStyle='rgba(255,250,235,.96)';
-        ctx.strokeStyle='#18213a';ctx.lineWidth=4;
-        ctx.fillRect(392,92,360,82);ctx.strokeRect(392,92,360,82);
-        ctx.fillStyle='#18213a';ctx.font='bold 19px Courier New';
-        ctx.fillText(`♥ A wild ${g.companionPlayer==='p2'?'Player 2':'Player 1'} appeared!`,412,125);
-        ctx.font='15px Courier New';ctx.fillText('CO-OP MODE UNLOCKED.',412,151);
-        ctx.restore();
-      }
-
-      ctx.save();
-      ctx.fillStyle='#e95d78';ctx.font='22px serif';
-      const hx=(p.x+g.p2x)/2+18, hy=Math.min(p.y,g.p2y)-7;
-      ctx.fillText('♥',hx,hy);ctx.restore();
-    }
-
+    // Render Stage Goal (Flag or Final Wedding Arch)
     if(g.code==='final'){
+      // Grand Wedding Flower Arch / Ring Gate at x = 2260
+      const gx = 2220, gy = 190, gw = 96, gh = 130;
       ctx.save();
-      const gx = 681, gy = 202, gw = 88, gh = 120;
-      ctx.strokeStyle='#9d7b59';ctx.lineWidth=8;
-      ctx.beginPath();ctx.arc(gx+gw/2, gy+gh/2, gw/2-6, Math.PI*1.03, Math.PI*1.97);ctx.stroke();
-      ctx.fillStyle='#9d7b59';ctx.fillRect(gx+9, gy+gh/2, 8, 82);ctx.fillRect(gx+gw-17, gy+gh/2, 8, 82);
-      ctx.fillRect(gx-2, gy+gh+30, 28, 8);ctx.fillRect(gx+gw-26, gy+gh+30, 28, 8);
+      ctx.strokeStyle='#9d7b59'; ctx.lineWidth=8;
+      ctx.beginPath(); ctx.arc(gx+gw/2, gy+gh/2, gw/2-6, Math.PI*1.03, Math.PI*1.97); ctx.stroke();
+      ctx.fillStyle='#9d7b59'; ctx.fillRect(gx+9, gy+gh/2, 8, 92); ctx.fillRect(gx+gw-17, gy+gh/2, 8, 92);
       ['#f59db7','#ffd166','#ffffff','#ff7f9f'].forEach((col,idx)=>{
         ctx.fillStyle=col;
-        for(let i=0;i<7;i++){
-          const t=i/6;
-          const ang=Math.PI*(1.05+t*0.9);
+        for(let i=0; i<8; i++){
+          const t=i/7;
+          const ang=Math.PI*(1.04+t*0.92);
           const rx=gx+gw/2+Math.cos(ang)*(gw/2-7);
           const ry=gy+gh/2+Math.sin(ang)*(gh/2-10);
-          ctx.beginPath();ctx.arc(rx+(idx%2?2:-2), ry+(idx>1?1:-1), 6-(idx===1?1:0), 0, Math.PI*2);ctx.fill();
+          ctx.beginPath(); ctx.arc(rx+(idx%2?2:-2), ry+(idx>1?1:-1), 6, 0, Math.PI*2); ctx.fill();
         }
       });
       const ringImg = loadedAssets[ASSET_PATHS.ui.ring];
       if(ringImg){
-        const rh=34, rw=rh*(ringImg.width/ringImg.height);
-        ctx.drawImage(ringImg, gx+gw/2-rw/2, gy+58, rw, rh);
+        const rh=38, rw=rh*(ringImg.width/ringImg.height);
+        ctx.drawImage(ringImg, gx+gw/2-rw/2, gy+52, rw, rh);
       }
       ctx.restore();
     } else {
+      // Goal Flag at x = 2280
       const flagImg = loadedAssets[ASSET_PATHS.ui.flag];
       if(flagImg){
-        const fh=76, fw=fh*(flagImg.width/flagImg.height);
-        ctx.drawImage(flagImg, 748-fw/2, 292, fw, fh);
+        const fh=80, fw=fh*(flagImg.width/flagImg.height);
+        ctx.drawImage(flagImg, 2280 - fw/2, 292, fw, fh);
       } else {
-        ctx.fillStyle='#363b4f';ctx.fillRect(758,278,7,94);
-        ctx.fillStyle=g.collected>=4 ? '#e96a7a' : '#9b9b9b';
-        ctx.beginPath();ctx.moveTo(765,282);ctx.lineTo(792,292);ctx.lineTo(765,304);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#363b4f'; ctx.fillRect(2280, 278, 8, 94);
+        ctx.fillStyle='#e96a7a'; ctx.beginPath(); ctx.moveTo(2288, 282); ctx.lineTo(2316, 292); ctx.lineTo(2288, 304); ctx.closePath(); ctx.fill();
       }
     }
 
-    const x=Math.round(p.x), y=Math.round(p.y);
+    // Render Particle Bursts
+    g.bursts = g.bursts.filter(b=>b.life>0);
+    g.bursts.forEach(b=>{
+      const alpha = Math.max(0, b.life/24);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#ffd166';
+      ctx.font = 'bold 26px serif';
+      ctx.fillText(b.label, b.x-8, b.y - (24-b.life)*1.6);
+      ctx.restore();
+      b.life--;
+    });
+
+    // Render Co-op Companion (Player 2)
+    if(g.encounteredP2){
+      const companionAsset = g.companionPlayer==='p2' ? ASSET_PATHS.player.player2 : ASSET_PATHS.player.idle;
+      const p2 = loadedAssets[companionAsset];
+      if(p2){
+        const ph=52, pw=ph*(p2.width/p2.height);
+        ctx.drawImage(p2, g.p2x, g.p2y, pw, ph);
+      }
+      if(g.code==='de' && g.encounterTimer>0){
+        ctx.save();
+        ctx.fillStyle='rgba(255,250,235,.96)';
+        ctx.strokeStyle='#18213a'; ctx.lineWidth=4;
+        ctx.fillRect(g.p2x-30, g.p2y-110, 280, 74); ctx.strokeRect(g.p2x-30, g.p2y-110, 280, 74);
+        ctx.fillStyle='#18213a'; ctx.font='bold 15px Courier New';
+        ctx.fillText(`♥ A wild ${g.companionPlayer==='p2'?'Mira':'Eric'} appeared!`, g.p2x-16, g.p2y-82);
+        ctx.font='12px Courier New'; ctx.fillText('CO-OP MODE UNLOCKED ✨', g.p2x-16, g.p2y-58);
+        ctx.restore();
+      }
+    }
+
+    // Render Main Player Sprite with Running / Jumping Animation
+    const px = Math.round(p.x), py = Math.round(p.y);
     let pose;
     if(g.mainPlayer==='p2'){
-      pose=ASSET_PATHS.player.player2;
+      pose = ASSET_PATHS.player.player2;
     } else {
-      pose=ASSET_PATHS.player.idle;
-      if(!p.onGround) pose=ASSET_PATHS.player.jump;
-      else if(Math.abs(p.vx)>0.8){
-        g.frameTick+=1;
-        pose=(Math.floor(g.frameTick/8)%2===0)?ASSET_PATHS.player.run1:ASSET_PATHS.player.run2;
-      } else g.frameTick=0;
+      if(!p.onGround) pose = ASSET_PATHS.player.jump;
+      else {
+        g.frameTick++;
+        pose = (Math.floor(g.frameTick / 7) % 2 === 0) ? ASSET_PATHS.player.run1 : ASSET_PATHS.player.run2;
+      }
     }
-    const sprite=loadedAssets[pose];
+    const sprite = loadedAssets[pose] || loadedAssets[ASSET_PATHS.player.idle];
     if(sprite){
       const targetH = 52;
       const ratio = sprite.width / sprite.height;
       const dh = targetH;
       const dw = targetH * ratio;
-      ctx.drawImage(sprite, x + p.w/2 - dw/2, y + p.h - dh, dw, dh);
-    } else {
-      ctx.fillStyle='#ff3355';
-      ctx.fillRect(x,y,44,54);
-      ctx.fillStyle='#fff';
-      ctx.font='bold 13px Courier New';
-      ctx.fillText('SPRITE',x-2,y+22);
-      ctx.fillText('ERROR',x,y+40);
+      ctx.drawImage(sprite, px + p.w/2 - dw/2, py + p.h - dh, dw, dh);
     }
 
-    if(g.code==='final'){
-      if(g.collected<2 && p.x>646){
-        ctx.fillStyle='rgba(24,33,58,.92)';ctx.fillRect(488,105,282,54);
-        ctx.fillStyle='#fff';ctx.font='bold 16px Courier New';ctx.fillText('Collect at least 2 love items first!',504,138);
-      }
-    } else if(g.collected<4 && p.x>710){
-      ctx.fillStyle='rgba(24,33,58,.92)';ctx.fillRect(500,105,270,54);
-      ctx.fillStyle='#fff';ctx.font='bold 16px Courier New';ctx.fillText('Collect at least 4 story items first!',517,138);
-    }
+    ctx.restore(); // Exit World Space
+
+    // ================= LAYER 3: FIXED HUD OVERLAY =================
+    ctx.fillStyle='rgba(255,255,255,.88)';
+    ctx.fillRect(20, 18, 170, 42); ctx.strokeStyle='#18213a'; ctx.lineWidth=3; ctx.strokeRect(20, 18, 170, 42);
+    ctx.fillStyle='#18213a'; ctx.font='bold 17px Courier New'; ctx.fillText(g.theme.landmark, 32, 45);
   }
 
+  // --- Stage Completion Handler ---
   function finishGame(code, skipped=false){
     const g=games[code];
     if(g && g.finished) return;
-    if(g){g.finished=true;if(g.raf)cancelAnimationFrame(g.raf);}
+    if(g){ g.finished=true; if(g.raf) cancelAnimationFrame(g.raf); }
+
     const memory=document.getElementById(code+'-memory');
     if(memory) memory.classList.add('show');
+
     const reveal=document.getElementById(code+'-reveal');
     if(reveal){
       reveal.classList.add('show');
       const rs=document.getElementById('final-route-summary');
       const rv=document.getElementById('final-route-visual');
       const route=routeForPlayer();
-      const names={tw:'🇹🇼 Taiwan',de:'🇩🇪 Germany',kr:'🇰🇷 Korea',final:'💍 Married'};
+      const names={tw:'🇹🇼 Taiwan', de:'🇩🇪 Germany', kr:'🇰🇷 Korea', final:'💍 Married'};
       if(rs) rs.textContent=`You started in ${state.player==='p2'?'Korea':'Taiwan'}, crossed paths in Germany, and reached the same ending together.`;
       if(rv) rv.innerHTML=route.map((id,i)=>`<span class="final-route-stop">${names[id]}</span>${i<route.length-1?'<span class="final-route-arrow">→</span>':''}`).join('');
     }
+
     const panel=document.getElementById(code+'-finish');
-    if(panel){
+    if(panel && !memory){
       panel.classList.add('show');
-      if(code==='final'){
-        document.getElementById(code+'-finish-copy').textContent = skipped
-          ? 'Ending skipped — you can still leave us a message.'
-          : `Final clear! ${g ? g.collected : 0}/3 love items collected.`;
-      } else {
-        document.getElementById(code+'-finish-copy').textContent = skipped
-          ? 'Level skipped — story mode continues. The next chapter is unlocked.'
-          : 'Level cleared. The next chapter is unlocked.';
-      }
-      panel.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+
+    if(memory) memory.scrollIntoView({behavior:'smooth',block:'center'});
+    else if(panel) panel.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  // --- Input Handlers (One-touch Jump & Keyboard) ---
+  function triggerJump(code){
+    const g=games[code];
+    if(g && !g.finished){
+      g.player.jumpBuffer = 8;
     }
   }
 
-  function queueJump(code){
-    const g=games[code]; if(g) g.jumpQueued=true;
-  }
-
+  // Keyboard Support
   window.addEventListener('keydown',(e)=>{
     const active=['tw','de','kr','final'].find(id=>document.getElementById(id).classList.contains('active'));
     if(!active) return;
-    if(['ArrowLeft','ArrowRight','ArrowUp',' ','Spacebar'].includes(e.key)) e.preventDefault();
-    if(e.key==='ArrowLeft') pressed.left=true;
-    if(e.key==='ArrowRight') pressed.right=true;
-    if(e.key==='ArrowUp'||e.key===' '||e.key==='Spacebar') queueJump(active);
+    if(['ArrowUp',' ','Spacebar','KeyW','Enter'].includes(e.code) || ['ArrowUp',' '].includes(e.key)){
+      e.preventDefault();
+      triggerJump(active);
+    }
   },{passive:false});
-  window.addEventListener('keyup',(e)=>{
-    if(e.key==='ArrowLeft') pressed.left=false;
-    if(e.key==='ArrowRight') pressed.right=false;
+
+  // Touch / Pointer on Runner Buttons
+  document.querySelectorAll('.runner-jump-btn').forEach(btn=>{
+    const code=btn.dataset.game;
+    const handleDown=(e)=>{
+      e.preventDefault();
+      btn.classList.add('pressed');
+      triggerJump(code);
+    };
+    const handleUp=(e)=>{
+      e.preventDefault();
+      btn.classList.remove('pressed');
+    };
+    btn.addEventListener('pointerdown',handleDown);
+    btn.addEventListener('pointerup',handleUp);
+    btn.addEventListener('pointercancel',handleUp);
   });
 
-  document.querySelectorAll('.control-btn').forEach(btn=>{
-    const action=btn.dataset.action, code=btn.dataset.game;
-    const down=(e)=>{
-      e.preventDefault();btn.classList.add('pressed');
-      if(action==='left') pressed.left=true;
-      if(action==='right') pressed.right=true;
-      if(action==='jump') queueJump(code);
-    };
-    const up=(e)=>{
-      e.preventDefault();btn.classList.remove('pressed');
-      if(action==='left') pressed.left=false;
-      if(action==='right') pressed.right=false;
-    };
-    btn.addEventListener('pointerdown',down);
-    btn.addEventListener('pointerup',up);
-    btn.addEventListener('pointercancel',up);
-    btn.addEventListener('pointerleave',up);
+  // Direct Canvas Touch / Tap to Jump
+  ['tw','de','kr','final'].forEach(code=>{
+    const canvas=document.getElementById(code+'-game');
+    if(canvas){
+      canvas.addEventListener('pointerdown',(e)=>{
+        e.preventDefault();
+        triggerJump(code);
+      });
+    }
   });
 
+  // ================================================================
+  // 📅 WEDDING UTILITY: CALENDAR, MAPS & GUESTBOOK
+  // ================================================================
+  function addToCalendar(){
+    const info=CUSTOMIZE_HERE.weddingInfo;
+    const title=encodeURIComponent(info.title);
+    const loc=encodeURIComponent(info.location);
+    const details=encodeURIComponent(info.description);
+    // Format YYYYMMDDTHHmmssZ
+    const d=info.date.replace(/-/g,'');
+    const startHour=info.startTime.replace(':','')+'00';
+    const endHour=info.endTime.replace(':','')+'00';
+    const dates=`${d}T${startHour}/${d}T${endHour}`;
+    
+    // Google Calendar URL
+    const googleUrl=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${loc}`;
+    window.open(googleUrl, '_blank');
+  }
+
+  function saveMessage(){
+    const n=document.getElementById('guestName'), m=document.getElementById('guestMsg');
+    const name=n.value.trim(), msg=m.value.trim();
+    if(!name || !msg){ alert('Please enter your name and blessing message.'); return; }
+    const arr=JSON.parse(localStorage.getItem('guestMessages')||'[]');
+    arr.unshift({name, msg, date:new Date().toLocaleDateString()});
+    localStorage.setItem('guestMessages',JSON.stringify(arr.slice(0,30)));
+    n.value=''; m.value='';
+    renderMessages();
+  }
+
+  function renderMessages(){
+    const box=document.getElementById('messages');
+    const arr=JSON.parse(localStorage.getItem('guestMessages')||'[]');
+    box.innerHTML=arr.length
+      ? arr.map(x=>`<div class="msg"><b>${escapeHtml(x.name)} <small>· ${escapeHtml(x.date)}</small></b>${escapeHtml(x.msg)}</div>`).join('')
+      : '<div class="msg"><b>No messages yet.</b>Be the first to leave a sweet blessing ✨</div>';
+  }
+
+  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  // Initial Boot
   renderPlayerChoice();
   refreshMap();
 </script>
